@@ -2,9 +2,7 @@ EasyRefreshToken is a library to manage refresh token opreation Easy ..
 
 - In AppDbContext Class:
 
-`public class AppDbContext : public class AppDbContext : IDbSetRefreshToken<User, Guid>`
-
-
+  `public class AppDbContext :IdentityDbContext<User, IdentityRole<Guid>, Guid>, IDbSetRefreshToken<User, Guid>`
 
 - in Program Class: 
 
