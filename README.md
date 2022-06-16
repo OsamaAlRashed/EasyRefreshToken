@@ -1,4 +1,4 @@
-EasyRefreshToken is a library to manage refresh token opreation Easy ..
+EasyRefreshToken is a library to manage refresh token opreations easy ..
 
 - In AppDbContext Class:
 
@@ -8,7 +8,7 @@ EasyRefreshToken is a library to manage refresh token opreation Easy ..
 
   `builder.Services.AddRefreshToken<AppDbContext, User, Guid>();`
 
-- now you can user **TokenService** that contains:
+- now you can use **TokenService** that contains:
   - OnLogin
   - OnLogout
   - OnAccessTokenExpired
