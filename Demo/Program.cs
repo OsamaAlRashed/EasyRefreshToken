@@ -1,5 +1,6 @@
 using Demo.Models;
 using EasyRefreshToken.DependencyInjection;
+using EasyRefreshToken.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +37,7 @@ builder.Services.AddRefreshToken<AppDbContext, User, Guid>(options =>
     options.MultiDevice = false;
     options.BlockLoginWhenActive = false;
     options.GenerateTokenMethod = () => { return ""; };
+    options.OnChangePasswordBehavior = OnChangePasswordBehavior.DeleteAllTokens;
 });
 
 var app = builder.Build();

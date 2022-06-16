@@ -1,6 +1,7 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.Models;
 using EasyRefreshToken.Utils;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,15 +13,29 @@ using System.Threading.Tasks;
 
 namespace EasyRefreshToken.TokenService
 {
+    public class TokenService<TDbContext> : TokenService<TDbContext, IdentityUser<string> , string> where TDbContext : DbContext, IDbSetRefreshToken<IdentityUser<string>, string>
+    {
+        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default) : base(context, options)
+        {
+        }
+    }
+
+    public class TokenService<TDbContext, TUser> : TokenService<TDbContext, TUser, string> where TDbContext : DbContext, IDbSetRefreshToken<TUser, string>
+    {
+        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default): base(context, options)
+        {
+        }
+    }
+
     public class TokenService<TDbContext, TUser, TKey> : ITokenService where TDbContext : DbContext, IDbSetRefreshToken<TUser, TKey>
     {
         private readonly TDbContext _context;
-        private readonly TokenOptions _options;
+        private readonly RefreshTokenOptions _options;
 
-        public TokenService(TDbContext context, IOptions<TokenOptions> options = default)
+        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default)
         {
             _context = context;
-            _options = options?.Value ?? new TokenOptions();
+            _options = options?.Value ?? new RefreshTokenOptions();
         }
 
         public async Task<string> OnLogin<TKey>(TKey userId)
@@ -152,7 +167,6 @@ namespace EasyRefreshToken.TokenService
         }
 
         #endregion
-
 
     }
 }

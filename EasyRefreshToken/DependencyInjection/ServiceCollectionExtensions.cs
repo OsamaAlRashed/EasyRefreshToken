@@ -1,5 +1,6 @@
 ﻿using EasyRefreshToken.Models;
 using EasyRefreshToken.TokenService;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -19,8 +20,17 @@ namespace EasyRefreshToken.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services, Action<TokenOptions> options = default) 
+        public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services, Action<RefreshTokenOptions> options = default) 
             where TDbContext : DbContext, IDbSetRefreshToken<TUser, TKey>
             => services.Configure(options).AddScoped<ITokenService, TokenService<TDbContext, TUser, TKey>>();
+
+        public static IServiceCollection AddRefreshToken<TDbContext, TUser>(this IServiceCollection services, Action<RefreshTokenOptions> options = default)
+            where TDbContext : DbContext, IDbSetRefreshToken<TUser, string>
+            => services.Configure(options).AddScoped<ITokenService, TokenService<TDbContext, TUser>>();
+
+
+        public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services, Action<RefreshTokenOptions> options = default)
+            where TDbContext : DbContext, IDbSetRefreshToken<IdentityUser<string>, string>
+            => services.Configure(options).AddScoped<ITokenService, TokenService<TDbContext>>();
     }
 }

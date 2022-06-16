@@ -9,7 +9,7 @@ namespace EasyRefreshToken.DependencyInjection
     /// <summary>
     /// Options to control on Token Service
     /// </summary>
-    public class TokenOptions
+    public class RefreshTokenOptions
     {
         /// <summary>
         /// if true, more than one device will be allowed to access the account at the same time
