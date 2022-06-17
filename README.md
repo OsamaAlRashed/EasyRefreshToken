@@ -1,9 +1,7 @@
-**EasyRefreshToken 6.0.2**
+### **EasyRefreshToken 6.0.2**
 
-What's new?? 
+**What's new??** 
 More overload for Clear method and Support limited active devices.
-
-EasyRefreshToken is a library to manage refresh token operations with EF Core easy ..
 
 - In AppDbContext Class:
 
@@ -14,9 +12,11 @@ EasyRefreshToken is a library to manage refresh token operations with EF Core ea
   `builder.Services.AddRefreshToken<AppDbContext, User, Guid>();`
 
 - don't forget:
-   `Add-Migration`
-   `Update-Database`
+  `Add-Migration`
+  `Update-Database`
+
 - now you can use **TokenService** that contains:
+
   - OnLogin
   - OnLogout
   - OnAccessTokenExpired
@@ -24,10 +24,13 @@ EasyRefreshToken is a library to manage refresh token operations with EF Core ea
   - Clear
 
 - and you can control with many options:
+
   - MultiDevice
   - TokenExpiredDays
   - BlockLoginWhenActive
   - GenerateTokenMethod
   - OnChangePasswordBehavior
- 
+
+- note: when change on options, I highly recommend cleaning the table by `Clear`
+
 - Enjoy ... 
