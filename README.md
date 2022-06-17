@@ -3,6 +3,8 @@
 **What's new??** 
 - More overload for Clear method and Support limited active devices.
 
+**Documentation** 
+
 - In AppDbContext Class:
 
   `public class AppDbContext :IdentityDbContext<User, IdentityRole<Guid>, Guid>, IDbSetRefreshToken<User, Guid>`
@@ -25,11 +27,11 @@
 
 - and you can control with many options:
 
-  - MultiDevice
+  - MaxNumberOfActiveDevices
   - TokenExpiredDays
-  - BlockLoginWhenActive
+  - PreventingLoginWhenAccessToMaxNumberOfActiveDevices
   - GenerateTokenMethod
-  - OnChangePasswordBehavior
+  - TokenGenerationMethod
 
 - note: when change on options, I highly recommend cleaning the table by `Clear`
 
