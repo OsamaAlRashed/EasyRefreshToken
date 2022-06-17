@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace EasyRefreshToken.Models
 {
@@ -10,6 +11,7 @@ namespace EasyRefreshToken.Models
     /// <typeparam name="TUser">User</typeparam>
     /// <typeparam name="TKey">Key</typeparam>
     public class RefreshToken<TUser, TKey>
+        where TKey : IEquatable<TKey>
     {
         /// <summary>
         /// Key of Table

@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Demo.Models
 {
-    public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>, IDbSetRefreshToken<User, Guid>
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-
+            
         }
 
-        public DbSet<RefreshToken<User, Guid>> RefreshTokens { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }

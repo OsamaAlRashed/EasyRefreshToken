@@ -13,9 +13,9 @@ namespace Demo.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
-        private readonly ITokenService tokenService;
+        private readonly ITokenService<Guid> tokenService;
 
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService<Guid> tokenService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -30,10 +30,10 @@ namespace Demo.Controllers
                 UserName = "User" + GetNumberToken(),
                 Email = "user" + GetNumberToken() + "@email.com"
             };
+            var password = "demo";
+            var result = await userManager.CreateAsync(user, password);
 
-            var result = await userManager.CreateAsync(user, "demo");
-
-            return Ok(new { user.Id, user.UserName});
+            return Ok(new { user.Id, user.UserName,password});
         }
 
         [HttpPost]
@@ -80,11 +80,11 @@ namespace Demo.Controllers
             {
                 if (onlyExpired)
                 {
-                    result = await tokenService.ClearExpired(userId);
+                    result = await tokenService.ClearExpired(userId.Value);
                 }
                 else
                 {
-                    result = await tokenService.Clear(userId);
+                    result = await tokenService.Clear(userId.Value);
                 }
             }
             return Ok(result);

@@ -14,21 +14,39 @@ using System.Threading.Tasks;
 
 namespace EasyRefreshToken.TokenService
 {
-    public class TokenService<TDbContext> : TokenService<TDbContext, IdentityUser<string> , string> where TDbContext : DbContext, IDbSetRefreshToken<IdentityUser<string>, string>
+    public class TokenService<TDbContext> : TokenService<TDbContext, Guid>
+        where TDbContext : DbContext
     {
-        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default) : base(context, options)
+        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default) : base(context,
+            options)
         {
         }
     }
 
-    public class TokenService<TDbContext, TUser> : TokenService<TDbContext, TUser, string> where TDbContext : DbContext, IDbSetRefreshToken<TUser, string>
+    public class TokenService<TDbContext, TKey> : TokenService<TDbContext, IdentityUser<TKey>, TKey>
+        where TDbContext : DbContext
+        where TKey : IEquatable<TKey>
     {
-        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default): base(context, options)
+        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default) : base(context,
+            options)
         {
         }
     }
 
-    public class TokenService<TDbContext, TUser, TKey> : ITokenService where TDbContext : DbContext, IDbSetRefreshToken<TUser, TKey>
+    public class TokenService<TDbContext, TUser, TKey> : TokenService<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>
+        where TDbContext : DbContext
+        where TKey : IEquatable<TKey>
+    {
+        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default) : base(context,
+            options)
+        {
+        }
+    }
+
+    public class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
+        where TRefreshToken : RefreshToken<TUser, TKey>, new()
+        where TDbContext : DbContext
+        where TKey : IEquatable<TKey>
     {
         private readonly TDbContext _context;
         private readonly RefreshTokenOptions _options;
@@ -39,7 +57,7 @@ namespace EasyRefreshToken.TokenService
             _options = options?.Value ?? new RefreshTokenOptions();
         }
 
-        public async Task<string> OnLogin<TKey>(TKey userId)
+        public async Task<string> OnLogin(TKey userId)
         {
             if (await IsAccessToLimit(userId))
             {
@@ -55,9 +73,9 @@ namespace EasyRefreshToken.TokenService
 
         public async Task<bool> OnLogout(string oldToken) => await Delete(x => x.Token == oldToken);
 
-        public async Task<string> OnAccessTokenExpired<TKey>(TKey userId, string token)
+        public async Task<string> OnAccessTokenExpired(TKey userId, string token)
         {
-            var check = await _context.RefreshTokens.Where(x => x.UserId.Equals(userId) && x.Token == token
+            var check = await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.Token == token
                 && (!_options.TokenExpiredDays.HasValue || DateTime.Now <= x.ExpiredDate)).AnyAsync();
             if (check)
             {
@@ -67,7 +85,7 @@ namespace EasyRefreshToken.TokenService
             return null;
         }
 
-        public async Task<string> OnChangePassword<TKey>(TKey userId)
+        public async Task<string> OnChangePassword(TKey userId)
         {
             if (_options.OnChangePasswordBehavior == Enums.OnChangePasswordBehavior.None)
                 return null;
@@ -83,18 +101,18 @@ namespace EasyRefreshToken.TokenService
         public async Task<bool> ClearExpired()
             => await Delete(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.Now);
 
-        public async Task<bool> ClearExpired<TKey>(TKey userId)
+        public async Task<bool> ClearExpired(TKey userId)
             => await Delete(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.Now);
 
-        public async Task<bool> Clear<TKey>(TKey userId) => await Delete(x => x.UserId.Equals(userId));
+        public async Task<bool> Clear(TKey userId) => await Delete(x => x.UserId.Equals(userId));
 
         #region Private 
 
-        private async Task<string> Add<TKey>(TKey userId)
+        private async Task<string> Add(TKey userId)
         {
             try
             {
-                var refreshToken = new RefreshToken<TUser, TKey>
+                var refreshToken = new TRefreshToken()
                 {
                     Token = GenerateToken(),
                     UserId = userId,
@@ -118,20 +136,20 @@ namespace EasyRefreshToken.TokenService
             return Helpers.GenerateRefreshToken();
         }
 
-        private async Task<bool> IsAccessToLimit<TKey>(TKey userId)
+        private async Task<bool> IsAccessToLimit(TKey userId)
             => _options.MaxNumberOfActiveDevices.HasValue && await GetNumberActiveTokens(userId) >= _options.MaxNumberOfActiveDevices.Value;
 
         private bool IsMultiDevices() => !_options.MaxNumberOfActiveDevices.HasValue || _options.MaxNumberOfActiveDevices > 1;
 
-        private async Task<int> GetNumberActiveTokens<TKey>(TKey userId)
-            => await _context.RefreshTokens.Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
+        private async Task<int> GetNumberActiveTokens(TKey userId)
+            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
 
-        private async Task<bool> Delete(Expression<Func<RefreshToken<TUser, TKey>, bool>> filter)
+        private async Task<bool> Delete(Expression<Func<TRefreshToken, bool>> filter)
         {
             try
             {
-                var oldRefreshTokens = await _context.RefreshTokens.Where(filter).ToListAsync();
-                _context.RefreshTokens.RemoveRange(oldRefreshTokens);
+                var oldRefreshTokens = await _context.Set<TRefreshToken>().Where(filter).ToListAsync();
+                _context.Set<TRefreshToken>().RemoveRange(oldRefreshTokens);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -141,8 +159,8 @@ namespace EasyRefreshToken.TokenService
             }
         }
 
-        private async Task<string> GetOldedToken<TKey>(TKey userId)
-            => await _context.RefreshTokens.Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
+        private async Task<string> GetOldedToken(TKey userId)
+            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
         #endregion
 
