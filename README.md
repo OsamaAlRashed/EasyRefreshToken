@@ -1,4 +1,4 @@
-EasyRefreshToken is a library to manage refresh token opreations easy ..
+EasyRefreshToken is a library to manage refresh token operations easy ..
 
 - In AppDbContext Class:
 
