@@ -90,9 +90,9 @@ namespace EasyRefreshToken.TokenService
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 
@@ -113,9 +113,9 @@ namespace EasyRefreshToken.TokenService
 
                 return refreshToken.Token;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 
@@ -132,9 +132,9 @@ namespace EasyRefreshToken.TokenService
                     return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
             return false;
         }
@@ -152,9 +152,9 @@ namespace EasyRefreshToken.TokenService
                     return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
             return false;
         }

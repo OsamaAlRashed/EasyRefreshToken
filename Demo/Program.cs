@@ -36,7 +36,6 @@ builder.Services.AddRefreshToken<AppDbContext, User, Guid>(options =>
     options.TokenExpiredDays = 1;
     options.MultiDevice = false;
     options.BlockLoginWhenActive = false;
-    options.GenerateTokenMethod = () => { return ""; };
     options.OnChangePasswordBehavior = OnChangePasswordBehavior.DeleteAllTokens;
 });
 
