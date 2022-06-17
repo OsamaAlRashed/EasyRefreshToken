@@ -1,7 +1,7 @@
 ### **EasyRefreshToken 6.0.2**
 
 **What's new??** 
-More overload for Clear method and Support limited active devices.
+- More overload for Clear method and Support limited active devices.
 
 - In AppDbContext Class:
 
