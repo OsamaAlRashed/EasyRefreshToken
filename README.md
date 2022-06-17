@@ -1,4 +1,9 @@
-EasyRefreshToken is a library to manage refresh token operations easy ..
+**EasyRefreshToken 6.0.2**
+
+What's new?? 
+More overload for Clear method and Support limited active devices.
+
+EasyRefreshToken is a library to manage refresh token operations with EF Core easy ..
 
 - In AppDbContext Class:
 
