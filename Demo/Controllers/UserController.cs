@@ -62,9 +62,31 @@ namespace Demo.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Clear()
+        public async Task<IActionResult> Clear(Guid? userId, bool onlyExpired)
         {
-            var result = await tokenService.Clear();
+            bool result = true;
+            if(userId == null)
+            {
+                if (onlyExpired)
+                {
+                    result = await tokenService.ClearExpired();
+                }
+                else
+                {
+                    result = await tokenService.Clear();
+                }
+            }
+            else
+            {
+                if (onlyExpired)
+                {
+                    result = await tokenService.ClearExpired(userId);
+                }
+                else
+                {
+                    result = await tokenService.Clear(userId);
+                }
+            }
             return Ok(result);
         }
 

@@ -12,10 +12,10 @@ namespace EasyRefreshToken.DependencyInjection
     public class RefreshTokenOptions
     {
         /// <summary>
-        /// if true, more than one device will be allowed to access the account at the same time
-        /// if false, only one device is allowed to access the account at the same time
+        /// Max number Of Active Devices per user, if set null will be unlimited
         /// </summary>
-        public bool MultiDevice { get; set; } = false;
+        [Range(1, int.MaxValue)]
+        public int? MaxNumberOfActiveDevices { get; set; } = null;
 
         /// <summary>
         /// The number of days until the token expires, if it is configured as null, the code will never expire.
@@ -24,15 +24,15 @@ namespace EasyRefreshToken.DependencyInjection
         public int? TokenExpiredDays { get; set; } = 7;
 
         /// <summary>
-        /// if true and there is valid token, then login operation will be blocked.
-        /// note: this option valid when MultiDevice is false.
+        /// if set true and there is valid token, then login operation will be prevent.
+        /// if set false, then old token will be removed and add a new token  
         /// </summary>
-        public bool BlockLoginWhenActive { get; set; } = false;
+        public bool PreventingLoginWhenAccessToMaxNumberOfActiveDevices { get; set; } = true;
 
         /// <summary>
         /// Determination generation method
         /// </summary>
-        public Func<string> GenerateTokenMethod { get; set; } = null;
+        public Func<string> TokenGenerationMethod { get; set; } = null;
 
         /// <summary>
         /// Determination OnChangePassword Method Behavior

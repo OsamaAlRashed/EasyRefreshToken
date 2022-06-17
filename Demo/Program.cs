@@ -33,9 +33,9 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 
 builder.Services.AddRefreshToken<AppDbContext, User, Guid>(options =>
 {
-    options.TokenExpiredDays = 1;
-    options.MultiDevice = false;
-    options.BlockLoginWhenActive = false;
+    options.TokenExpiredDays = 7;
+    options.MaxNumberOfActiveDevices = 2;
+    options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
     options.OnChangePasswordBehavior = OnChangePasswordBehavior.DeleteAllTokens;
 });
 

@@ -38,9 +38,27 @@ namespace EasyRefreshToken.TokenService
         Task<string> OnChangePassword<TKey>(TKey userId);
 
         /// <summary>
-        /// clear refresh token table
+        /// clear token table
         /// </summary>
         /// <returns>true if success, false if faild</returns>
         Task<bool> Clear();
+
+        /// <summary>
+        /// clear Expired token table
+        /// </summary>
+        /// <returns>true if success, false if faild</returns>
+        Task<bool> ClearExpired();
+
+        /// <summary>
+        /// clear token for user
+        /// </summary>
+        /// <returns>true if success, false if faild</returns>
+        Task<bool> Clear<TKey>(TKey userId);
+
+        /// <summary>
+        /// clear Expired token for user
+        /// </summary>
+        /// <returns>true if success, false if faild</returns>
+        Task<bool> ClearExpired<TKey>(TKey userId);
     }
 }
