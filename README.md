@@ -8,6 +8,9 @@ EasyRefreshToken is a library to manage refresh token opreations easy ..
 
   `builder.Services.AddRefreshToken<AppDbContext, User, Guid>();`
 
+- don't forget:
+   `Add-Migration`
+   `Update-Database`
 - now you can use **TokenService** that contains:
   - OnLogin
   - OnLogout
