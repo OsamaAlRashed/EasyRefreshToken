@@ -31,7 +31,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddRefreshToken<AppDbContext, User, Guid>(options =>
+builder.Services.AddRefreshToken<AppDbContext,User, Guid>(options =>
 {
     options.TokenExpiredDays = 7;
     options.MaxNumberOfActiveDevices = 2;
