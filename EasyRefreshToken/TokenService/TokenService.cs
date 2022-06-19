@@ -14,21 +14,10 @@ using System.Threading.Tasks;
 
 namespace EasyRefreshToken.TokenService
 {
-    public class TokenService<TDbContext> : TokenService<TDbContext, IdentityUser<string> , string> where TDbContext : DbContext, IDbSetRefreshToken<IdentityUser<string>, string>
-    {
-        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default) : base(context, options)
-        {
-        }
-    }
-
-    public class TokenService<TDbContext, TUser> : TokenService<TDbContext, TUser, string> where TDbContext : DbContext, IDbSetRefreshToken<TUser, string>
-    {
-        public TokenService(TDbContext context, IOptions<RefreshTokenOptions> options = default): base(context, options)
-        {
-        }
-    }
-
-    public class TokenService<TDbContext, TUser, TKey> : ITokenService where TDbContext : DbContext, IDbSetRefreshToken<TUser, TKey>
+    public class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService 
+        where TDbContext : DbContext
+        where TRefreshToken : RefreshToken<TUser, TKey> , new()
+        where TKey : IEquatable<TKey>
     {
         private readonly TDbContext _context;
         private readonly RefreshTokenOptions _options;
@@ -57,7 +46,7 @@ namespace EasyRefreshToken.TokenService
 
         public async Task<string> OnAccessTokenExpired<TKey>(TKey userId, string token)
         {
-            var check = await _context.RefreshTokens.Where(x => x.UserId.Equals(userId) && x.Token == token
+            var check = await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.Token == token
                 && (!_options.TokenExpiredDays.HasValue || DateTime.Now <= x.ExpiredDate)).AnyAsync();
             if (check)
             {
@@ -94,7 +83,7 @@ namespace EasyRefreshToken.TokenService
         {
             try
             {
-                var refreshToken = new RefreshToken<TUser, TKey>
+                var refreshToken =  new RefreshToken<TUser, TKey>
                 {
                     Token = GenerateToken(),
                     UserId = userId,
@@ -124,14 +113,14 @@ namespace EasyRefreshToken.TokenService
         private bool IsMultiDevices() => !_options.MaxNumberOfActiveDevices.HasValue || _options.MaxNumberOfActiveDevices > 1;
 
         private async Task<int> GetNumberActiveTokens<TKey>(TKey userId)
-            => await _context.RefreshTokens.Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
+            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
 
         private async Task<bool> Delete(Expression<Func<RefreshToken<TUser, TKey>, bool>> filter)
         {
             try
             {
-                var oldRefreshTokens = await _context.RefreshTokens.Where(filter).ToListAsync();
-                _context.RefreshTokens.RemoveRange(oldRefreshTokens);
+                var oldRefreshTokens = await _context.Set<TRefreshToken>().Where(filter).ToListAsync();
+                _context.RemoveRange(oldRefreshTokens);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -142,7 +131,7 @@ namespace EasyRefreshToken.TokenService
         }
 
         private async Task<string> GetOldedToken<TKey>(TKey userId)
-            => await _context.RefreshTokens.Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
+            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
         #endregion
 

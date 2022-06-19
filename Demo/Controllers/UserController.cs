@@ -30,10 +30,10 @@ namespace Demo.Controllers
                 UserName = "User" + GetNumberToken(),
                 Email = "user" + GetNumberToken() + "@email.com"
             };
+            var password = "demo";
+            var result = await userManager.CreateAsync(user, password);
 
-            var result = await userManager.CreateAsync(user, "demo");
-
-            return Ok(new { user.Id, user.UserName});
+            return Ok(new { user.Id, user.UserName , password});
         }
 
         [HttpPost]
