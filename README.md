@@ -25,20 +25,20 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, User, Guid>()
 
 - now you can use **ITokenService<TKey>** that contains:
 
-  - OnLogin
-  - OnLogout
-  - OnAccessTokenExpired
-  - OnChangePassword
-  - Clear
-  - ClearExpired
+  - `OnLogin`
+  - `OnLogout`
+  - `OnAccessTokenExpired`
+  - `OnChangePassword`
+  - `Clear`
+  - `ClearExpired`
 
 - and you can control with many options:
 
-  - MaxNumberOfActiveDevices
-  - TokenExpiredDays
-  - PreventingLoginWhenAccessToMaxNumberOfActiveDevices
-  - TokenGenerationMethod
-  - OnChangePasswordBehavior
+  - `MaxNumberOfActiveDevices`
+  - `TokenExpiredDays`
+  - `PreventingLoginWhenAccessToMaxNumberOfActiveDevices`
+  - `TokenGenerationMethod`
+  - `OnChangePasswordBehavior`
 
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
 
