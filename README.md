@@ -1,4 +1,4 @@
-### **EasyRefreshToken 6.0.4**
+### **EasyRefreshToken 6.0.5**
 
 **What's new??** 
 - Remove IDbSetRefreshToken.
@@ -17,7 +17,7 @@
 - In Program Class: 
 
    `builder.Services.AddRefreshToken<AppDbContext, RefreshToken<TUser, TKey>, TUser, TKey>();`
-or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, User, Guid>();`
+or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>();`
 
 - don't forget:
   `Add-Migration`
