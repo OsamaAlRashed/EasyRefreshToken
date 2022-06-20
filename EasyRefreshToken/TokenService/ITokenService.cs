@@ -3,37 +3,37 @@
 namespace EasyRefreshToken.TokenService
 {
     /// <summary>
-    /// Service contains commonlly method to 
+    /// Service contains commonlly method to deal with refresh token 
     /// </summary>
     public interface ITokenService<TKey>
     {
         /// <summary>
-        /// this method shoud be called by login.
+        /// Adds new token for user
         /// </summary>
-        /// <param name="userId">user' Id for cuurent user</param>
+        /// <param name="userId">current user Id</param>
         /// <returns>new refresh token</returns>
         Task<string> OnLogin(TKey userId);
 
         /// <summary>
-        /// this method shoud be called by logout.
+        /// Delete token
         /// </summary>
-        /// <param name="token">current user token</param>
+        /// <param name="token">current token</param>
         /// <returns>true if success, false if faild</returns>
         Task<bool> OnLogout(string token);
 
         /// <summary>
-        /// this method shoud be called by Refresh Access Token
+        /// Update refresh token
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="oldToken"></param>
-        /// <returns></returns>
+        /// <param name="userId">current user Id</param>
+        /// <param name="oldToken">current token</param>
+        /// <returns>new token</returns>
         Task<string> OnAccessTokenExpired(TKey userId, string oldToken);
 
         /// <summary>
         /// this method shoud be called by Change Password
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">current user Id</param>
+        /// <returns>It depends on OnChangePasswordBehavior option</returns>
         Task<string> OnChangePassword(TKey userId);
 
         /// <summary>
@@ -51,13 +51,13 @@ namespace EasyRefreshToken.TokenService
         /// <summary>
         /// clear token for user
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userId">current user Id</param>
         /// <returns></returns>
         Task<bool> Clear(TKey userId);
         /// <summary>
         /// clear Expired token for user
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userId">current user Id</param>
         /// <returns></returns>
         Task<bool> ClearExpired(TKey userId);
     }

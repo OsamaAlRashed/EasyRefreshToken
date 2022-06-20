@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace EasyRefreshToken.Enums
 {
     /// <summary>
-    /// OnChangePassword Method Behaviors
+    /// OnChangePassword method behaviors
     /// </summary>
     public enum OnChangePasswordBehavior
     {
@@ -16,11 +16,11 @@ namespace EasyRefreshToken.Enums
         /// </summary>
         None,
         /// <summary>
-        /// Delete all Tokens, login is required after this step
+        /// Delete all tokens, login is required after this step
         /// </summary>
         DeleteAllTokens,
         /// <summary>
-        /// Delete all tokens and add new token
+        /// Delete all tokens for user and return new token
         /// </summary>
         DeleteAllTokensAndAddNewToken
     }

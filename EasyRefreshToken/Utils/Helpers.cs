@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace EasyRefreshToken.Utils
 {
+    /// <summary>
+    /// Helpers methods
+    /// </summary>
     public static class Helpers
     {
+        /// <summary>
+        /// default generation
+        /// </summary>
+        /// <returns>unique refresh token</returns>
         public static string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];

@@ -7,25 +7,28 @@ using System.Text;
 namespace EasyRefreshToken.DependencyInjection
 {
     /// <summary>
-    /// Options to control on Token Service
+    /// Options to control on token service
     /// </summary>
     public class RefreshTokenOptions
     {
         /// <summary>
-        /// Max number Of Active Devices per user, if set null will be unlimited
+        /// Max number Of Active Devices per user, if set null will be unlimited.
+        /// Default value is null
         /// </summary>
         [Range(1, int.MaxValue)]
         public int? MaxNumberOfActiveDevices { get; set; } = null;
 
         /// <summary>
-        /// The number of days until the token expires, if it is configured as null, the code will never expire.
+        /// The number of days until the token expires, if set null, the code will never expire.
+        /// Default value is 7 days
         /// </summary>
         [Range(1, int.MaxValue)]
         public int? TokenExpiredDays { get; set; } = 7;
 
         /// <summary>
-        /// if set true and there is valid token, then login operation will be prevent.
-        /// if set false, then old token will be removed and add a new token  
+        /// If set true and there is valid token, then login operation will be prevent.
+        /// If set false, then old token will be removed and add a new token  
+        /// Default value is true
         /// </summary>
         public bool PreventingLoginWhenAccessToMaxNumberOfActiveDevices { get; set; } = true;
 
@@ -36,6 +39,7 @@ namespace EasyRefreshToken.DependencyInjection
 
         /// <summary>
         /// Determination OnChangePassword Method Behavior
+        /// Dfault value is OnChangePasswordBehavior.DeleteAllTokens
         /// </summary>
         public OnChangePasswordBehavior OnChangePasswordBehavior { get; set; } = OnChangePasswordBehavior.DeleteAllTokens;
 
