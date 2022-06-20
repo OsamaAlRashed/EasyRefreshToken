@@ -1,4 +1,4 @@
-### **EasyRefreshToken 6.0.3**
+### **EasyRefreshToken 6.0.4**
 
 **What's new??** 
 - Remove IDbSetRefreshToken.
