@@ -5,34 +5,34 @@ using System.Text;
 namespace EasyRefreshToken.Models
 {
     /// <summary>
-    /// refresh token table
+    /// Refresh token entity
     /// </summary>
     /// <typeparam name="TUser">User</typeparam>
     /// <typeparam name="TKey">Key</typeparam>
     public class RefreshToken<TUser, TKey>
     {
         /// <summary>
-        /// Key of Table
+        /// Key of entity
         /// </summary>
         public TKey Id { get; set; }
 
         /// <summary>
-        /// Refresh Token
+        /// Refresh token
         /// </summary>
         public string Token { get; set; }
 
         /// <summary>
-        /// Expired Date of Token
+        /// Expired date of token
         /// </summary>
         public DateTime? ExpiredDate { get; set; }
 
         /// <summary>
-        /// Identity User
+        /// Identity user
         /// </summary>
         public TUser User { get; set; }
 
         /// <summary>
-        /// Forgien Key
+        /// Forgien key
         /// </summary>
         public TKey UserId { get; set; }
     }

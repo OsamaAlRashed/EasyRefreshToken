@@ -1,4 +1,4 @@
-### **EasyRefreshToken 6.0.5**
+### **EasyRefreshToken 6.0.6**
 
 **What's new??** 
 - Remove IDbSetRefreshToken.
@@ -11,19 +11,19 @@
 - If you do not want to add new features, you can skip the previous step.
 
 - In AppDbContext Class:
-
-  `public DbSet<MyRefreshToken> RefreshTokens { get; set; }`
+   `public DbSet<RefreshToken<TUser, TKey>> RefreshTokens { get; set; }`
+or `public DbSet<MyRefreshToken> RefreshTokens { get; set; }`
 
 - In Program Class: 
 
    `builder.Services.AddRefreshToken<AppDbContext, RefreshToken<TUser, TKey>, TUser, TKey>();`
 or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>();`
 
-- don't forget:
+- Don't forget:
   `Add-Migration`
   `Update-Database`
 
-- now you can use **ITokenService<TKey>** that contains:
+- Now you can use **ITokenService<TKey>** that contains:
 
   - `OnLogin`
   - `OnLogout`
@@ -32,7 +32,7 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   - `Clear`
   - `ClearExpired`
 
-- and you can control with many options:
+- And you can control with many options:
 
   - `MaxNumberOfActiveDevices`
   - `TokenExpiredDays`
