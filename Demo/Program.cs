@@ -31,13 +31,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, User, Guid>(options =>
-{
-    options.TokenExpiredDays = 7;
-    options.MaxNumberOfActiveDevices = 2;
-    options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
-    options.OnChangePasswordBehavior = OnChangePasswordBehavior.DeleteAllTokens;
-});
+builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, User, Guid>();
 
 var app = builder.Build();
 

@@ -22,12 +22,28 @@ namespace EasyRefreshToken.DependencyInjection
         /// <param name="options"></param>
         /// <returns></returns>
         public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken, TUser, TKey>(
-            this IServiceCollection services, Action<RefreshTokenOptions> options = default)
+            this IServiceCollection services, Action<RefreshTokenOptions> options)
             where TDbContext : DbContext
             where TRefreshToken : RefreshToken<TUser, TKey>, new()
             where TKey : IEquatable<TKey>
             => services.Configure(options)
                 .AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
+
+        /// <summary>
+        /// Add refresh token service to your project
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TRefreshToken"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken, TUser, TKey>(
+            this IServiceCollection services)
+            where TDbContext : DbContext
+            where TRefreshToken : RefreshToken<TUser, TKey>, new()
+            where TKey : IEquatable<TKey>
+            => services.AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
 
         /// <summary>
         /// Add refresh token service to your project
@@ -47,6 +63,19 @@ namespace EasyRefreshToken.DependencyInjection
         /// Add refresh token service to your project
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="services"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services)
+            where TDbContext : DbContext where TKey : IEquatable<TKey>
+            => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>();
+
+        /// <summary>
+        /// Add refresh token service to your project
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
         /// <typeparam name="TRefreshToken"></typeparam>
         /// <param name="services"></param>
         /// <param name="options"></param>
@@ -61,14 +90,34 @@ namespace EasyRefreshToken.DependencyInjection
         /// Add refresh token service to your project
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TRefreshToken"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken>(this IServiceCollection services)
+            where TDbContext : DbContext
+            where TRefreshToken : RefreshToken<IdentityUser<string>, string>, new()
+            => services.AddRefreshToken<TDbContext, TRefreshToken, IdentityUser<string>, string>();
+
+        /// <summary>
+        /// Add refresh token service to your project
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
         public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services,
             Action<RefreshTokenOptions> options = default)
             where TDbContext : DbContext
-            => services
-                .AddRefreshToken<TDbContext, RefreshToken<IdentityUser<string>, string>, IdentityUser<string>, string>(
-                    options);
+            => services.AddRefreshToken<TDbContext, RefreshToken<IdentityUser<string>, string>, IdentityUser<string>, string>(options);
+
+        /// <summary>
+        /// Add refresh token service to your project
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services)
+            where TDbContext : DbContext
+            => services.AddRefreshToken<TDbContext, RefreshToken<IdentityUser<string>, string>, IdentityUser<string>, string>();
     }
 }
