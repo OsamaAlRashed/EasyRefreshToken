@@ -27,7 +27,7 @@ namespace EasyRefreshToken.DependencyInjection
             where TRefreshToken : RefreshToken<TUser, TKey>, new()
             where TKey : IEquatable<TKey>
             => services.Configure(options)
-                .AddScoped<ITokenService, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
+                .AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
 
         /// <summary>
         /// Add refresh token service to your project

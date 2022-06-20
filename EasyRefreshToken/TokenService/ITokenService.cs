@@ -5,14 +5,14 @@ namespace EasyRefreshToken.TokenService
     /// <summary>
     /// Service contains commonlly method to 
     /// </summary>
-    public interface ITokenService
+    public interface ITokenService<TKey>
     {
         /// <summary>
         /// this method shoud be called by login.
         /// </summary>
         /// <param name="userId">user' Id for cuurent user</param>
         /// <returns>new refresh token</returns>
-        Task<string> OnLogin<TKey>(TKey userId);
+        Task<string> OnLogin(TKey userId);
 
         /// <summary>
         /// this method shoud be called by logout.
@@ -27,15 +27,14 @@ namespace EasyRefreshToken.TokenService
         /// <param name="userId"></param>
         /// <param name="oldToken"></param>
         /// <returns></returns>
-        Task<string> OnAccessTokenExpired<TKey>(TKey userId, string oldToken);
+        Task<string> OnAccessTokenExpired(TKey userId, string oldToken);
 
         /// <summary>
         /// this method shoud be called by Change Password
         /// </summary>
-        /// <typeparam name="TKey"></typeparam>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<string> OnChangePassword<TKey>(TKey userId);
+        Task<string> OnChangePassword(TKey userId);
 
         /// <summary>
         /// clear token table
@@ -52,13 +51,14 @@ namespace EasyRefreshToken.TokenService
         /// <summary>
         /// clear token for user
         /// </summary>
-        /// <returns>true if success, false if faild</returns>
-        Task<bool> Clear<TKey>(TKey userId);
-
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<bool> Clear(TKey userId);
         /// <summary>
         /// clear Expired token for user
         /// </summary>
-        /// <returns>true if success, false if faild</returns>
-        Task<bool> ClearExpired<TKey>(TKey userId);
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<bool> ClearExpired(TKey userId);
     }
 }

@@ -12,6 +12,6 @@ namespace Demo.Models
 
         }
 
-        public DbSet<RefreshToken<User, Guid>> RefreshTokens { get; set; }
+        public DbSet<MyRefreshToken> RefreshTokens { get; set; }
     }
 }

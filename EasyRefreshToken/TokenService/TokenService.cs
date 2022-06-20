@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace EasyRefreshToken.TokenService
 {
-    public class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService 
+    public class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
         where TDbContext : DbContext
         where TRefreshToken : RefreshToken<TUser, TKey> , new()
         where TKey : IEquatable<TKey>
@@ -28,7 +28,7 @@ namespace EasyRefreshToken.TokenService
             _options = options?.Value ?? new RefreshTokenOptions();
         }
 
-        public async Task<string> OnLogin<TKey>(TKey userId)
+        public async Task<string> OnLogin(TKey userId)
         {
             if (await IsAccessToLimit(userId))
             {
@@ -44,7 +44,7 @@ namespace EasyRefreshToken.TokenService
 
         public async Task<bool> OnLogout(string oldToken) => await Delete(x => x.Token == oldToken);
 
-        public async Task<string> OnAccessTokenExpired<TKey>(TKey userId, string token)
+        public async Task<string> OnAccessTokenExpired(TKey userId, string token)
         {
             var check = await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.Token == token
                 && (!_options.TokenExpiredDays.HasValue || DateTime.Now <= x.ExpiredDate)).AnyAsync();
@@ -56,7 +56,7 @@ namespace EasyRefreshToken.TokenService
             return null;
         }
 
-        public async Task<string> OnChangePassword<TKey>(TKey userId)
+        public async Task<string> OnChangePassword(TKey userId)
         {
             if (_options.OnChangePasswordBehavior == Enums.OnChangePasswordBehavior.None)
                 return null;
@@ -72,18 +72,18 @@ namespace EasyRefreshToken.TokenService
         public async Task<bool> ClearExpired()
             => await Delete(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.Now);
 
-        public async Task<bool> ClearExpired<TKey>(TKey userId)
+        public async Task<bool> ClearExpired(TKey userId)
             => await Delete(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.Now);
 
-        public async Task<bool> Clear<TKey>(TKey userId) => await Delete(x => x.UserId.Equals(userId));
+        public async Task<bool> Clear(TKey userId) => await Delete(x => x.UserId.Equals(userId));
 
         #region Private 
 
-        private async Task<string> Add<TKey>(TKey userId)
+        private async Task<string> Add(TKey userId)
         {
             try
             {
-                var refreshToken =  new RefreshToken<TUser, TKey>
+                var refreshToken =  new TRefreshToken()
                 {
                     Token = GenerateToken(),
                     UserId = userId,
@@ -107,12 +107,12 @@ namespace EasyRefreshToken.TokenService
             return Helpers.GenerateRefreshToken();
         }
 
-        private async Task<bool> IsAccessToLimit<TKey>(TKey userId)
+        private async Task<bool> IsAccessToLimit(TKey userId)
             => _options.MaxNumberOfActiveDevices.HasValue && await GetNumberActiveTokens(userId) >= _options.MaxNumberOfActiveDevices.Value;
 
         private bool IsMultiDevices() => !_options.MaxNumberOfActiveDevices.HasValue || _options.MaxNumberOfActiveDevices > 1;
 
-        private async Task<int> GetNumberActiveTokens<TKey>(TKey userId)
+        private async Task<int> GetNumberActiveTokens(TKey userId)
             => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
 
         private async Task<bool> Delete(Expression<Func<RefreshToken<TUser, TKey>, bool>> filter)
@@ -130,7 +130,7 @@ namespace EasyRefreshToken.TokenService
             }
         }
 
-        private async Task<string> GetOldedToken<TKey>(TKey userId)
+        private async Task<string> GetOldedToken(TKey userId)
             => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
         #endregion
