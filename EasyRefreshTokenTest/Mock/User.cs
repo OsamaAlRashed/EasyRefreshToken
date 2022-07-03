@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
+using System.Threading.Tasks;
 
-namespace Demo.Models
+namespace EasyRefreshTokenTest.Mock
 {
     public class User : IdentityUser<Guid>
     {
+
     }
+
+
 }

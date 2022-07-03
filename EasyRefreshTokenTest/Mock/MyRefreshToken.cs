@@ -1,6 +1,7 @@
 ﻿using EasyRefreshToken.Models;
+using System;
 
-namespace Demo.Models
+namespace EasyRefreshTokenTest.Mock
 {
     public class MyRefreshToken : RefreshToken<User, Guid>
     {
