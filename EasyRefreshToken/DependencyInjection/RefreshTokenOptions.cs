@@ -43,5 +43,9 @@ namespace EasyRefreshToken.DependencyInjection
         /// </summary>
         public OnChangePasswordBehavior OnChangePasswordBehavior { get; set; } = OnChangePasswordBehavior.DeleteAllTokens;
 
+        /// <summary>
+        /// Max number Of Active Devices per every type of user, if type not set will take <code>MaxNumberOfActiveDevices</code> option.
+        /// </summary>
+        public CustomMaxNumberOfActiveDevices CustomMaxNumberOfActiveDevices { get; set; }
     }
 }

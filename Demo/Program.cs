@@ -1,6 +1,7 @@
 using Demo.Models;
 using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.Enums;
+using EasyRefreshToken.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +32,11 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, User, Guid>();
+builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, User, Guid>
+    (op =>
+    {
+        op.CustomMaxNumberOfActiveDevices.Config((typeof(User), 2), (typeof(User), 1));
+    });
 
 var app = builder.Build();
 
