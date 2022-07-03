@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using EasyRefreshToken.Result;
+using System;
+using System.Threading.Tasks;
 
 namespace EasyRefreshToken.TokenService
 {
@@ -12,7 +14,7 @@ namespace EasyRefreshToken.TokenService
         /// </summary>
         /// <param name="userId">current user Id</param>
         /// <returns>new refresh token</returns>
-        Task<string> OnLogin(TKey userId);
+        Task<TokenResult> OnLogin(TKey userId);
 
         /// <summary>
         /// Delete token
@@ -27,7 +29,7 @@ namespace EasyRefreshToken.TokenService
         /// <param name="userId">current user Id</param>
         /// <param name="oldToken">current token</param>
         /// <returns>new token</returns>
-        Task<string> OnAccessTokenExpired(TKey userId, string oldToken);
+        Task<TokenResult> OnAccessTokenExpired(TKey userId, string oldToken);
 
         /// <summary>
         /// this method shoud be called by Change Password

@@ -1,5 +1,6 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.Models;
+using EasyRefreshToken.Result;
 using EasyRefreshToken.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace EasyRefreshToken.TokenService
     public class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
         where TDbContext : DbContext
         where TRefreshToken : RefreshToken<TUser, TKey> , new()
+        where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
         private readonly TDbContext _context;
@@ -28,38 +30,67 @@ namespace EasyRefreshToken.TokenService
             _options = options?.Value ?? new RefreshTokenOptions();
         }
 
-        public async Task<string> OnLogin(TKey userId)
+        public async Task<TokenResult> OnLogin(TKey userId)
         {
-            if (await IsAccessToLimit(userId))
+            var userType = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
+            if (userType == null)
+                return new TokenResult
+                {
+                    ErrorMessage = $"User with id {userId} not found",
+                    IsSucceded = false,
+                };
+
+            if (await IsAccessToLimit(userId, userType.GetType()))
             {
-                if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices)
-                    return null;
                 var oldedToken = await GetOldedToken(userId);
-                if (oldedToken == null)
-                    return null;
+                if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
+                    return new TokenResult
+                    {
+                        ErrorMessage = "Login not allowed because access to max number of active devices.",
+                        IsSucceded = false,
+                    };
                 await Delete(x => x.Token == oldedToken);
             }
-            return await Add(userId);
+            return new TokenResult
+            {
+                Token = await Add(userId),
+                IsSucceded = true
+            };
         }
 
         public async Task<bool> OnLogout(string oldToken) => await Delete(x => x.Token == oldToken);
 
-        public async Task<string> OnAccessTokenExpired(TKey userId, string token)
+        public async Task<TokenResult> OnAccessTokenExpired(TKey userId, string token)
         {
-            var check = await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.Token == token
-                && (!_options.TokenExpiredDays.HasValue || DateTime.Now <= x.ExpiredDate)).AnyAsync();
+            var userType = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
+            if (userType == null)
+                return new TokenResult
+                {
+                    ErrorMessage = $"User with id {userId} not found",
+                    IsSucceded = false,
+                };
+
+            var check = await _context.Set<TRefreshToken>()
+                .Where(x => x.UserId.Equals(userId) && x.Token == token
+                    && (!_options.TokenExpiredDays.HasValue || DateTime.Now <= x.ExpiredDate)).AnyAsync();
             if (check)
             {
                 await Delete(x => x.Token == token);
-                return await Add(userId);
+                return new TokenResult
+                {
+                    Token = await Add(userId),
+                    IsSucceded = true
+                };
             }
-            return null;
+            return new TokenResult
+            {
+                ErrorMessage = $"User with id {userId} not found",
+                IsSucceded = false,
+            };
         }
 
         public async Task<string> OnChangePassword(TKey userId)
         {
-            if (_options.OnChangePasswordBehavior == Enums.OnChangePasswordBehavior.None)
-                return null;
             await Delete(x => x.UserId.Equals(userId));
             if (_options.OnChangePasswordBehavior == Enums.OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
                 return await Add(userId);
@@ -107,10 +138,11 @@ namespace EasyRefreshToken.TokenService
             return Helpers.GenerateRefreshToken();
         }
 
-        private async Task<bool> IsAccessToLimit(TKey userId)
-            => _options.MaxNumberOfActiveDevices.HasValue && await GetNumberActiveTokens(userId) >= _options.MaxNumberOfActiveDevices.Value;
-
-        private bool IsMultiDevices() => !_options.MaxNumberOfActiveDevices.HasValue || _options.MaxNumberOfActiveDevices > 1;
+        private async Task<bool> IsAccessToLimit(TKey userId, Type type)
+        {
+            var limit = GetMaxNumberOfActiveDevicesPerUser(type);
+            return limit.HasValue && await GetNumberActiveTokens(userId) >= limit;
+        }
 
         private async Task<int> GetNumberActiveTokens(TKey userId)
             => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
@@ -120,6 +152,8 @@ namespace EasyRefreshToken.TokenService
             try
             {
                 var oldRefreshTokens = await _context.Set<TRefreshToken>().Where(filter).ToListAsync();
+                if (!oldRefreshTokens.Any())
+                    return false;
                 _context.RemoveRange(oldRefreshTokens);
                 await _context.SaveChangesAsync();
                 return true;
@@ -133,7 +167,14 @@ namespace EasyRefreshToken.TokenService
         private async Task<string> GetOldedToken(TKey userId)
             => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
-        #endregion
 
+        private int? GetMaxNumberOfActiveDevicesPerUser(Type type = default)
+        {
+            if (_options.CustomMaxNumberOfActiveDevices?.ContainsKey(type) ?? false)
+                return _options.CustomMaxNumberOfActiveDevices[type];
+            return _options.MaxNumberOfActiveDevices;
+        }
+
+        #endregion
     }
 }

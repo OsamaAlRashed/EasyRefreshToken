@@ -12,10 +12,6 @@ namespace EasyRefreshToken.Enums
     public enum OnChangePasswordBehavior
     {
         /// <summary>
-        /// No thing.
-        /// </summary>
-        None,
-        /// <summary>
         /// Delete all tokens, login is required after this step
         /// </summary>
         DeleteAllTokens,
