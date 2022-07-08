@@ -1,9 +1,8 @@
-### **EasyRefreshToken 6.0.6**
+### **EasyRefreshToken 6.0.8**
 
 **What's new??** 
-- Remove IDbSetRefreshToken.
-- Customize your refresh token entity.
-- Support .Net 5
+- Max number of active devices per user type (TPT).
+- Max number of active devices per user property (this option uses Reflection, so may be slow!)
 
 **Documentation** 
 
@@ -40,6 +39,8 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   - `TokenGenerationMethod`
   - `OnChangePasswordBehavior`
 
+- for `MaxNumberOfActiveDevices` use `CustomMaxNumberOfActiveDevices.Config()`.
+   
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
 
 - Enjoy ... 
