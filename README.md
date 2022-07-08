@@ -1,7 +1,8 @@
-### **EasyRefreshToken 6.0.7**
+### **EasyRefreshToken 6.0.8**
 
 **What's new??** 
-- Custom max number of active devices per user type (TPT).
+- Max number of active devices per user type (TPT).
+- Max number of active devices per user property (this option uses Reflection, so may be slow!)
 
 **Documentation** 
 
@@ -37,10 +38,8 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   - `PreventingLoginWhenAccessToMaxNumberOfActiveDevices`
   - `TokenGenerationMethod`
   - `OnChangePasswordBehavior`
-  - `CustomMaxNumberOfActiveDevices`
 
-- for `CustomMaxNumberOfActiveDevices`:
-   `op.CustomMaxNumberOfActiveDevices = CustomMaxNumberOfActiveDevices.Config((typeof(SubUser1), 1), (typeof(SubUser2), 2));`
+- for `MaxNumberOfActiveDevices` use `CustomMaxNumberOfActiveDevices.Config()`.
    
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
 
