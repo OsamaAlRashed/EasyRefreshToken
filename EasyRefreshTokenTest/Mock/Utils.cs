@@ -16,9 +16,20 @@ namespace EasyRefreshTokenTest.Mock
             this.context = context;
         }
 
-        private async Task<LoginVM> GenerateUserBase(int number = 0)
+        private async Task<LoginVM> GenerateUserBase(int number = 0, int? userType = null)
         {
             var user = new User();
+            if(userType != null)
+            {
+                if (userType == 0)
+                {
+                    user.UserType = UserType.Admin;
+                }
+                if (userType == 1)
+                {
+                    user.UserType = UserType.Employee;
+                }
+            }
             if(number == 1)
             {
                 user = new SubUser1();
@@ -40,6 +51,12 @@ namespace EasyRefreshTokenTest.Mock
          => await GenerateUserBase(1);
         public async Task<LoginVM> GenerateUserSubUser2()
          => await GenerateUserBase(2);
+
+        public async Task<LoginVM> GenerateAdmin()
+         => await GenerateUserBase(0, 0);
+
+        public async Task<LoginVM> GenerateEmployee()
+         => await GenerateUserBase(0, 1);
 
         private static string GetNumberToken(int size = 4)
         {

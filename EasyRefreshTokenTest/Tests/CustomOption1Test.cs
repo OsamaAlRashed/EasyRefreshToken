@@ -1,4 +1,5 @@
-﻿using EasyRefreshToken.TokenService;
+﻿using EasyRefreshToken.DependencyInjection;
+using EasyRefreshToken.TokenService;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ namespace EasyRefreshTokenTest.Tests
         {
             var provider = Startup.ConfigureService(op =>
             {
-                op.MaxNumberOfActiveDevices = 3;
+                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Config(3);
                 op.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
                 op.TokenExpiredDays = null;
                 op.TokenGenerationMethod = () =>

@@ -1,4 +1,5 @@
 ﻿using EasyRefreshToken.DependencyInjection;
+using EasyRefreshToken.DependencyInjection.Enums;
 using EasyRefreshToken.Models;
 using EasyRefreshToken.Result;
 using EasyRefreshToken.Utils;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace EasyRefreshToken.TokenService
 {
-    public class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
+    internal class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
         where TDbContext : DbContext
         where TRefreshToken : RefreshToken<TUser, TKey> , new()
         where TUser : IdentityUser<TKey>
@@ -32,15 +33,15 @@ namespace EasyRefreshToken.TokenService
 
         public async Task<TokenResult> OnLogin(TKey userId)
         {
-            var userType = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
-            if (userType == null)
+            var user = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
+            if (user == null)
                 return new TokenResult
                 {
                     ErrorMessage = $"User with id {userId} not found",
                     IsSucceded = false,
                 };
 
-            if (await IsAccessToLimit(userId, userType.GetType()))
+            if (await IsAccessToLimit(userId, user))
             {
                 var oldedToken = await GetOldedToken(userId);
                 if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
@@ -138,9 +139,9 @@ namespace EasyRefreshToken.TokenService
             return Helpers.GenerateRefreshToken();
         }
 
-        private async Task<bool> IsAccessToLimit(TKey userId, Type type)
+        private async Task<bool> IsAccessToLimit(TKey userId, TUser user)
         {
-            var limit = GetMaxNumberOfActiveDevicesPerUser(type);
+            var limit = GetMaxNumberOfActiveDevicesPerUser(user);
             return limit.HasValue && await GetNumberActiveTokens(userId) >= limit;
         }
 
@@ -168,11 +169,39 @@ namespace EasyRefreshToken.TokenService
             => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
 
-        private int? GetMaxNumberOfActiveDevicesPerUser(Type type = default)
+        private int? GetMaxNumberOfActiveDevicesPerUser(TUser user = default)
         {
-            if (_options.CustomMaxNumberOfActiveDevices?.ContainsKey(type) ?? false)
-                return _options.CustomMaxNumberOfActiveDevices[type];
-            return _options.MaxNumberOfActiveDevices;
+            if (_options.MaxNumberOfActiveDevices == null)
+                return null;
+
+            switch (_options.MaxNumberOfActiveDevices.type)
+            {
+                case MaxNumberOfActiveDevicesType.GlobalLimit:
+                    return _options.MaxNumberOfActiveDevices.globalLimit;
+
+                case MaxNumberOfActiveDevicesType.LimitPerType:
+                    if(_options.MaxNumberOfActiveDevices.limitPerType.ContainsKey(user.GetType()))
+                        return _options.MaxNumberOfActiveDevices.limitPerType[user.GetType()];
+                    break;
+
+                case MaxNumberOfActiveDevicesType.LimitPerProperty:
+                    var propValue = GetPropertyValue(user);
+                    if (propValue == null || !_options.MaxNumberOfActiveDevices.limitPerProperty.Item2.ContainsKey(propValue))
+                        return null;
+                    return _options.MaxNumberOfActiveDevices.limitPerProperty.Item2[propValue];
+            }
+            return null;
+        }
+
+        private object GetPropertyValue(TUser user)
+        {
+            var propName = _options.MaxNumberOfActiveDevices.limitPerProperty.Item1;
+
+            var prop = user.GetType().GetProperties().Where(x => x.Name.ToLower() == propName.ToLower()).FirstOrDefault();
+            if (prop == null)
+                throw new Exception("property name not exist in the given object");
+
+            return prop.GetValue(user);
         }
 
         #endregion
