@@ -12,13 +12,6 @@ namespace EasyRefreshToken.DependencyInjection
     public class RefreshTokenOptions
     {
         /// <summary>
-        /// Max number Of Active Devices per user, if set null will be unlimited.
-        /// Default value is null
-        /// </summary>
-        [Range(1, int.MaxValue)]
-        public int? MaxNumberOfActiveDevices { get; set; } = null;
-
-        /// <summary>
         /// The number of days until the token expires, if set null, the code will never expire.
         /// Default value is 7 days
         /// </summary>
@@ -46,6 +39,6 @@ namespace EasyRefreshToken.DependencyInjection
         /// <summary>
         /// Max number Of Active Devices per every type of user, if type not set will take <code>MaxNumberOfActiveDevices</code> option.
         /// </summary>
-        public CustomMaxNumberOfActiveDevices CustomMaxNumberOfActiveDevices { get; set; }
+        public MaxNumberOfActiveDevices MaxNumberOfActiveDevices { get; set; }
     }
 }

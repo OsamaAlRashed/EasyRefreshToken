@@ -22,8 +22,7 @@ namespace EasyRefreshTokenTest.Tests
         {
             var provider = Startup.ConfigureService(op =>
             {
-                op.MaxNumberOfActiveDevices = 3;
-                op.CustomMaxNumberOfActiveDevices = CustomMaxNumberOfActiveDevices.Config((typeof(SubUser1), 1), (typeof(SubUser2), 2));
+                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Config((typeof(SubUser1), 1), (typeof(SubUser2), 2));
             }).BuildServiceProvider();
             tokenService = provider.GetRequiredService<ITokenService<Guid>>();
             context = provider.GetRequiredService<AppDbContext>();
@@ -87,10 +86,10 @@ namespace EasyRefreshTokenTest.Tests
 
             var finalResult = tokenResult1.IsSucceded
                 && tokenResult2.IsSucceded
-                && tokenResult3.IsSucceded;
+                && tokenResult3.IsSucceded
+                && tokenResult4.IsSucceded;
 
             Assert.True(finalResult);
-            Assert.False(tokenResult4.IsSucceded);
         }
 
         [Fact]
