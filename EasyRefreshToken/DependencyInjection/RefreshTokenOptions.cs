@@ -1,4 +1,4 @@
-﻿using EasyRefreshToken.Enums;
+﻿using EasyRefreshToken.DependencyInjection.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

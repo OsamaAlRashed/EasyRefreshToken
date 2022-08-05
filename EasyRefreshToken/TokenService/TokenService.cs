@@ -93,7 +93,7 @@ namespace EasyRefreshToken.TokenService
         public async Task<string> OnChangePassword(TKey userId)
         {
             await Delete(x => x.UserId.Equals(userId));
-            if (_options.OnChangePasswordBehavior == Enums.OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
+            if (_options.OnChangePasswordBehavior == OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
                 return await Add(userId);
             return "";
         }
