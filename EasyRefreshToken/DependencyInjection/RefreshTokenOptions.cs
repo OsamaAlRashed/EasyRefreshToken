@@ -1,4 +1,4 @@
-﻿using EasyRefreshToken.Enums;
+﻿using EasyRefreshToken.DependencyInjection.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -40,5 +40,10 @@ namespace EasyRefreshToken.DependencyInjection
         /// Max number Of Active Devices per every type of user, if type not set will take <code>MaxNumberOfActiveDevices</code> option.
         /// </summary>
         public MaxNumberOfActiveDevices MaxNumberOfActiveDevices { get; set; }
+
+        /// <summary>
+        /// Save changes in database automaticlly. The default value is true.
+        /// </summary>
+        public bool SaveChanges { get; set; } = true;
     }
 }

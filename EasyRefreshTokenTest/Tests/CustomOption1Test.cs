@@ -1,13 +1,10 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.TokenService;
 using EasyRefreshTokenTest.Mock;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -34,7 +31,7 @@ namespace EasyRefreshTokenTest.Tests
                     }
                     return s;
                 };
-                op.OnChangePasswordBehavior = EasyRefreshToken.Enums.OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken;
+                op.OnChangePasswordBehavior = EasyRefreshToken.DependencyInjection.Enums.OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken;
             }).BuildServiceProvider();
             tokenService = provider.GetRequiredService<ITokenService<Guid>>();
             context = provider.GetRequiredService<AppDbContext>();
