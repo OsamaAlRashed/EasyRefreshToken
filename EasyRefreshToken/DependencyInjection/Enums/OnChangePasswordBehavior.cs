@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EasyRefreshToken.Enums
+namespace EasyRefreshToken.DependencyInjection.Enums
 {
     /// <summary>
     /// OnChangePassword method behaviors

@@ -93,7 +93,7 @@ namespace EasyRefreshToken.TokenService
         public async Task<string> OnChangePassword(TKey userId)
         {
             await Delete(x => x.UserId.Equals(userId));
-            if (_options.OnChangePasswordBehavior == Enums.OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
+            if (_options.OnChangePasswordBehavior == OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
                 return await Add(userId);
             return "";
         }
@@ -122,7 +122,8 @@ namespace EasyRefreshToken.TokenService
                     ExpiredDate = _options.TokenExpiredDays.HasValue ? DateTime.Now.AddDays(_options.TokenExpiredDays.Value) : null
                 };
                 _context.Add(refreshToken);
-                await _context.SaveChangesAsync();
+                if(_options.SaveChanges)
+                    await _context.SaveChangesAsync();
 
                 return refreshToken.Token;
             }
@@ -156,7 +157,8 @@ namespace EasyRefreshToken.TokenService
                 if (!oldRefreshTokens.Any())
                     return false;
                 _context.RemoveRange(oldRefreshTokens);
-                await _context.SaveChangesAsync();
+                if (_options.SaveChanges)
+                    await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
