@@ -40,7 +40,7 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   - `OnChangePasswordBehavior`
   - `SaveChanges`
 
-- for `MaxNumberOfActiveDevices` use `CustomMaxNumberOfActiveDevices.Config()`.
+- For `MaxNumberOfActiveDevices` use `CustomMaxNumberOfActiveDevices.Config()`.
    
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
 
