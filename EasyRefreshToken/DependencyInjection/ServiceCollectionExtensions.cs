@@ -66,7 +66,7 @@ namespace EasyRefreshToken.DependencyInjection
             where TKey : IEquatable<TKey>
             => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>(options);
 
-        /// <summary>
+        /// <summary> 
         /// Adds and configures refresh token service
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>

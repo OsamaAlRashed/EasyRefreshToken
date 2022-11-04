@@ -1,8 +1,7 @@
-### **EasyRefreshToken 6.0.9**
+### **EasyRefreshToken 6.0.10**
 
 **What's new??** 
-- Add `SaveChanges` option.
-- Some general improves.
+- Some general improvements.
 
 **Documentation** 
 
@@ -40,7 +39,7 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   - `OnChangePasswordBehavior`
   - `SaveChanges`
 
-- For `MaxNumberOfActiveDevices` use `CustomMaxNumberOfActiveDevices.Config()`.
+- For `MaxNumberOfActiveDevices` use `MaxNumberOfActiveDevices.Config()`.
    
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
 

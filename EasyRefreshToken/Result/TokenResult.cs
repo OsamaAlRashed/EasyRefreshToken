@@ -11,6 +11,13 @@ namespace EasyRefreshToken.Result
     /// </summary>
     public class TokenResult
     {
+        public TokenResult(bool isSucceded = false, string token = null, string errorMessage = null)
+        {
+            IsSucceded = isSucceded;
+            Token = token;
+            ErrorMessage = errorMessage;
+        }
+
         /// <summary>
         /// if IsSucceded true then the process ok.
         /// </summary>
@@ -25,5 +32,13 @@ namespace EasyRefreshToken.Result
         /// Error message (if there)
         /// </summary>
         public string ErrorMessage { get; set; }
+
+
+        public static TokenResult Success(string token)
+            => new TokenResult(true, token);
+
+        public static TokenResult Faild(string errorMessage)
+            => new TokenResult(false, null, errorMessage);
     }
+
 }

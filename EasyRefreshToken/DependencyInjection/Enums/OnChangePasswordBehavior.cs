@@ -12,7 +12,7 @@ namespace EasyRefreshToken.DependencyInjection.Enums
     public enum OnChangePasswordBehavior
     {
         /// <summary>
-        /// Delete all tokens, login is required after this step
+        /// Delete all tokens, login is required after this option
         /// </summary>
         DeleteAllTokens,
         /// <summary>
