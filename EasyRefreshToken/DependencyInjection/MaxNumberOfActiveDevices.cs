@@ -20,10 +20,10 @@ namespace EasyRefreshToken.DependencyInjection
         private MaxNumberOfActiveDevices() { }
 
         /// <summary>
-        /// 
+        /// Configures number of active devices by global limit.
         /// </summary>
         /// <param name="limit"></param>
-        /// <returns></returns>
+        /// <returns>New Instance from MaxNumberOfActiveDevices</returns>
         public static MaxNumberOfActiveDevices Config(int limit)
         {
             if(limit <= 0)
@@ -36,9 +36,9 @@ namespace EasyRefreshToken.DependencyInjection
         }
 
         /// <summary>
-        /// Configure custom max number of active devices option.
+        /// Configures number of active devices by user type (TPT).
         /// </summary>
-        /// <param name="pairs">VlaueTuble that present every type with limit it.</param>
+        /// <param name="pairs">ValueTuble that present every type with limit it.</param>
         /// <returns>return new instance from <code>MaxNumberOfActiveDevices</code></returns>
         public static MaxNumberOfActiveDevices Config(params (Type type, int limit)[] pairs)
         {
@@ -55,7 +55,7 @@ namespace EasyRefreshToken.DependencyInjection
         }
 
         /// <summary>
-        /// 
+        /// Configures number of active devices by user type (Property).
         /// </summary>
         /// <param name="propName"></param>
         /// <param name="pairs"></param>
