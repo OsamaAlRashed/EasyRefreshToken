@@ -3,17 +3,22 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>5.0.9</Version>
+    <Version>5.0.10</Version>
     <Authors>Osama Al-Rashed</Authors>
     <Company>None</Company>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Description>Package for manage refresh token with EF core</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Refresh_Package.png</PackageIcon>
+    <ApplicationIcon>Refresh_Package.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\Desktop\Telegram\Refresh_Package.png">
+    <Content Include="Refresh_Package.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\OneDrive\Desktop\Refresh_Package.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

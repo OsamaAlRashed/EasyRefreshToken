@@ -1,4 +1,5 @@
 ﻿using EasyRefreshToken.DependencyInjection.Enums;
+using EasyRefreshToken.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -28,7 +29,7 @@ namespace EasyRefreshToken.DependencyInjection
         /// <summary>
         /// Determination generation method
         /// </summary>
-        public Func<string> TokenGenerationMethod { get; set; } = null;
+        public Func<string> TokenGenerationMethod { get; set; } = () => Helpers.GenerateRefreshToken();
 
         /// <summary>
         /// Determination OnChangePassword Method Behavior
@@ -37,12 +38,12 @@ namespace EasyRefreshToken.DependencyInjection
         public OnChangePasswordBehavior OnChangePasswordBehavior { get; set; } = OnChangePasswordBehavior.DeleteAllTokens;
 
         /// <summary>
-        /// Max number Of Active Devices per every type of user, if type not set will take <code>MaxNumberOfActiveDevices</code> option.
+        /// Max number Of active devices per every type of user, if type not set will take <code>MaxNumberOfActiveDevices</code> option.
         /// </summary>
         public MaxNumberOfActiveDevices MaxNumberOfActiveDevices { get; set; }
 
         /// <summary>
-        /// Save changes in database automaticlly. The default value is true.
+        /// Save changes in database automaticlly, the default value is true.
         /// </summary>
         public bool SaveChanges { get; set; } = true;
     }

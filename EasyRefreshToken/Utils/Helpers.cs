@@ -10,18 +10,34 @@ namespace EasyRefreshToken.Utils
     /// <summary>
     /// Helpers methods
     /// </summary>
-    public static class Helpers
+    internal static class Helpers
     {
         /// <summary>
-        /// default generation
+        /// Default token generater 
         /// </summary>
         /// <returns>unique refresh token</returns>
-        public static string GenerateRefreshToken()
+        internal static string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+        }
+
+        /// <summary>
+        /// Get value from property name by reflection 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="propName"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        internal static object GetPropertyValue(object user, string propName)
+        {
+            var prop = user.GetType().GetProperties().Where(x => x.Name.ToLower() == propName.ToLower()).FirstOrDefault();
+            if (prop == null)
+                throw new Exception("property name not exist in the given object");
+
+            return prop.GetValue(user);
         }
     }
 }
