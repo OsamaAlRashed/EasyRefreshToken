@@ -39,7 +39,7 @@ namespace EasyRefreshToken.TokenService
 
             if (await IsAccessToLimit(userId, user))
             {
-                var oldedToken = await GetOldedToken(userId);
+                var oldedToken = await GetOldestToken(userId);
                 if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
                     return TokenResult.Faild("Login not allowed because access to max number of active devices.");
                 await Delete(x => x.Token == oldedToken);
@@ -141,7 +141,7 @@ namespace EasyRefreshToken.TokenService
             }
         }
 
-        private async Task<string> GetOldedToken(TKey userId)
+        private async Task<string> GetOldestToken(TKey userId)
             => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
 
