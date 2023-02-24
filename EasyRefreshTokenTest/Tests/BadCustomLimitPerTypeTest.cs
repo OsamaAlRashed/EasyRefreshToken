@@ -1,5 +1,5 @@
 ﻿using EasyRefreshToken.DependencyInjection;
-using EasyRefreshToken.TokenService;
+using EasyRefreshToken.Service;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;

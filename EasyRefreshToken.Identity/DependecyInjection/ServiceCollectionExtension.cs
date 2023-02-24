@@ -1,9 +1,12 @@
 ﻿using EasyRefreshToken.Abstractions;
 using EasyRefreshToken.Models;
 using EasyRefreshToken.Service;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace EasyRefreshToken.DependencyInjection
 {
@@ -26,7 +29,7 @@ namespace EasyRefreshToken.DependencyInjection
             this IServiceCollection services, Action<RefreshTokenOptions> options)
             where TDbContext : DbContext
             where TRefreshToken : RefreshToken<TUser, TKey>, new()
-            where TUser : class, IUser<TKey>
+            where TUser : IUser<TKey>
             where TKey : IEquatable<TKey>
             => services.Configure(options)
                 .AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
@@ -44,7 +47,7 @@ namespace EasyRefreshToken.DependencyInjection
             this IServiceCollection services)
             where TDbContext : DbContext
             where TRefreshToken : RefreshToken<TUser, TKey>, new()
-            where TUser : class, IUser<TKey>
+            where TUser : IUser<TKey>
             where TKey : IEquatable<TKey>
             => services.AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
 
@@ -60,7 +63,7 @@ namespace EasyRefreshToken.DependencyInjection
         public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services,
             Action<RefreshTokenOptions> options = default)
             where TDbContext : DbContext
-            where TUser : class, IUser<TKey>
+            where TUser : IdentityUser<TKey>
             where TKey : IEquatable<TKey>
             => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>(options);
 
@@ -75,7 +78,7 @@ namespace EasyRefreshToken.DependencyInjection
         /// <returns>The same service collection</returns>
         public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services)
             where TDbContext : DbContext
-            where TUser : class, IUser<TKey>
+            where TUser : IdentityUser<TKey>
             where TKey : IEquatable<TKey>
             => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>();
 
@@ -90,8 +93,8 @@ namespace EasyRefreshToken.DependencyInjection
         public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken>(this IServiceCollection services,
             Action<RefreshTokenOptions> options = default)
             where TDbContext : DbContext
-            where TRefreshToken : RefreshToken<IUser<string>, string>, new()
-            => services.AddRefreshToken<TDbContext, TRefreshToken, IUser<string>, string>(options);
+            where TRefreshToken : RefreshToken<IdentityUser<string>, string>, new()
+            => services.AddRefreshToken<TDbContext, TRefreshToken, IdentityUser<string>, string>(options);
 
         /// <summary>
         /// Adds and configures refresh token service
@@ -102,8 +105,8 @@ namespace EasyRefreshToken.DependencyInjection
         /// <returns>The same service collection</returns>
         public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken>(this IServiceCollection services)
             where TDbContext : DbContext
-            where TRefreshToken : RefreshToken<IUser<string>, string>, new()
-            => services.AddRefreshToken<TDbContext, TRefreshToken, IUser<string>, string>();
+            where TRefreshToken : RefreshToken<IdentityUser<string>, string>, new()
+            => services.AddRefreshToken<TDbContext, TRefreshToken, IdentityUser<string>, string>();
 
         /// <summary>
         /// Adds and configures refresh token service
@@ -115,7 +118,7 @@ namespace EasyRefreshToken.DependencyInjection
         public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services,
             Action<RefreshTokenOptions> options = default)
             where TDbContext : DbContext
-            => services.AddRefreshToken<TDbContext, RefreshToken<IUser<string>, string>, IUser<string>, string>(options);
+            => services.AddRefreshToken<TDbContext, RefreshToken<IdentityUser<string>, string>, IdentityUser<string>, string>(options);
 
         /// <summary>
         /// Adds and configures refresh token service
@@ -125,6 +128,6 @@ namespace EasyRefreshToken.DependencyInjection
         /// <returns>The same service collection</returns>
         public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services)
             where TDbContext : DbContext
-            => services.AddRefreshToken<TDbContext, RefreshToken<IUser<string>, string>, IUser<string>, string>();
+            => services.AddRefreshToken<TDbContext, RefreshToken<IdentityUser<string>, string>, IdentityUser<string>, string>();
     }
 }

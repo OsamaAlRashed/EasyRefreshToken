@@ -1,6 +1,6 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.Result;
-using EasyRefreshToken.TokenService;
+using EasyRefreshToken.Service;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -33,9 +33,7 @@ namespace EasyRefreshTokenTest.Tests
             Utils util = new Utils(context);
             var user = await util.GenerateUser();
 
-            var x = tokenService.OnLogin;
-
-            await Assert.ThrowsAsync<Exception>(async ()
+            await Assert.ThrowsAsync<ArgumentNullException>(async ()
                 => await tokenService.OnLogin(user.Id));
         }
     }

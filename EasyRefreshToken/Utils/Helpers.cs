@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EasyRefreshToken.Utils
 {
     /// <summary>
-    /// Helpers methods
+    /// Helpers method
     /// </summary>
     internal static class Helpers
     {
         /// <summary>
-        /// Default token generater 
+        /// Generates random string as base 64
         /// </summary>
-        /// <returns>unique refresh token</returns>
+        /// <returns>Unique refresh token</returns>
         internal static string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -25,19 +22,19 @@ namespace EasyRefreshToken.Utils
         }
 
         /// <summary>
-        /// Get value from property name by reflection 
+        /// Gets a value from property name by reflection 
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="propName"></param>
-        /// <returns></returns>
+        /// <param name="object">The object that contains property</param>
+        /// <param name="propName">Property's name</param>
+        /// <returns>A value of a given property as object</returns>
         /// <exception cref="Exception"></exception>
-        internal static object GetPropertyValue(object user, string propName)
+        internal static object GetPropertyValue(object @object, string propName)
         {
-            var prop = user.GetType().GetProperties().Where(x => x.Name.ToLower() == propName.ToLower()).FirstOrDefault();
+            var prop = @object.GetType().GetProperties().Where(x => x.Name.ToLower() == propName?.ToLower()).FirstOrDefault();
             if (prop == null)
-                throw new Exception("property name not exist in the given object");
+                throw new ArgumentNullException("Property name not exist in the given object.");
 
-            return prop.GetValue(user);
+            return prop.GetValue(@object);
         }
     }
 }
