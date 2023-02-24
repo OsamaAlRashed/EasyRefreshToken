@@ -1,6 +1,6 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.Result;
-using EasyRefreshToken.TokenService;
+using EasyRefreshToken.Service;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.Extensions.DependencyInjection;
 using System;

@@ -1,25 +1,22 @@
-﻿using EasyRefreshToken.DependencyInjection;
+﻿using EasyRefreshToken.Abstractions;
+using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.DependencyInjection.Enums;
 using EasyRefreshToken.Models;
 using EasyRefreshToken.Result;
 using EasyRefreshToken.Utils;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace EasyRefreshToken.TokenService
+namespace EasyRefreshToken.Service
 {
     internal partial class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
         where TDbContext : DbContext
         where TRefreshToken : RefreshToken<TUser, TKey> , new()
-        where TUser : IdentityUser<TKey>
+        where TUser : class, IUser<TKey>
         where TKey : IEquatable<TKey>
     {
         private readonly TDbContext _context;
@@ -89,7 +86,7 @@ namespace EasyRefreshToken.TokenService
     internal partial class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
         where TDbContext : DbContext
         where TRefreshToken : RefreshToken<TUser, TKey>, new()
-        where TUser : IdentityUser<TKey>
+        where TUser : class, IUser<TKey>
         where TKey : IEquatable<TKey>
     {
         private async Task<string> Add(TKey userId)

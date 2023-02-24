@@ -1,8 +1,7 @@
 ﻿using EasyRefreshToken.Result;
-using System;
 using System.Threading.Tasks;
 
-namespace EasyRefreshToken.TokenService
+namespace EasyRefreshToken.Service
 {
     /// <summary>
     /// Service contains commonlly method to deal with refresh token 
