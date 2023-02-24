@@ -1,5 +1,9 @@
 ### **EasyRefreshToken 1.0**
 
+- .Net 7: 7.0.1
+- .Net 6: 6.0.1
+- .Net 5: 5.0.1
+
 **What's new??** 
 - Remove dependencies on microsoft identity.
 - Add IUser intreface.
