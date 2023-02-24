@@ -1,9 +1,7 @@
 ﻿using EasyRefreshToken.DependencyInjection.Enums;
 using EasyRefreshToken.Utils;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace EasyRefreshToken.DependencyInjection
 {

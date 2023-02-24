@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using EasyRefreshToken.Abstractions;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
 
 namespace EasyRefreshTokenTest.Mock
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, IUser<Guid>
     {
         public UserType? UserType { get; set; }
     }
