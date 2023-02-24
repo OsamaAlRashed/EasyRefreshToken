@@ -1,7 +1,16 @@
-### **EasyRefreshToken 6.0.10**
+### **EasyRefreshToken 1.0**
+
+- .Net 7: 7.1.0
+- .Net 6: 6.1.0
+- .Net 5: 5.1.0
 
 **What's new??** 
-- Some general improvements.
+- Remove dependencies on microsoft identity.
+- Add IUser intreface.
+
+**Migrate to _.1.0**
+- You must make `TUser` inherit from IUser.
+- Change TokenService namespace to Service.
 
 **Documentation** 
 
