@@ -8,7 +8,7 @@
 - Remove dependencies on microsoft identity.
 - Add IUser intreface.
 
-** Migrate to _.1.0 **
+**Migrate to _.1.0**
 - You must make `TUser` inherit from IUser.
 - Change TokenService namespace to Service.
 
