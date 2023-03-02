@@ -30,17 +30,22 @@ namespace EasyRefreshToken.Service
 
         public async Task<TokenResult> OnLogin(TKey userId)
         {
-            var user = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
-            if (user == null)
-                return TokenResult.Faild($"User with id {userId} not found.");
+            var user = await _context.Set<TUser>()
+                .Where(x => x.Id.Equals(userId))
+                .SingleOrDefaultAsync();
 
-            if (await IsAccessToLimit(userId, user))
+            if (user == null)
+                return TokenResult.Failed($"User with id {userId} not found.");
+
+            if (await IsAccessToLimit(user))
             {
                 var oldedToken = await GetOldestToken(userId);
                 if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
-                    return TokenResult.Faild("Login not allowed because access to max number of active devices.");
+                    return TokenResult.Failed("Login not allowed because access to max number of active devices.");
+
                 await Delete(x => x.Token == oldedToken);
             }
+
             return TokenResult.Success(await Add(userId));
         }
 
@@ -50,17 +55,17 @@ namespace EasyRefreshToken.Service
         {
             var user = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
             if (user == null)
-                return TokenResult.Faild($"User with id {userId} not found");
+                return TokenResult.Failed($"User with id {userId} not found");
 
             var check = await _context.Set<TRefreshToken>()
                 .Where(x => x.UserId.Equals(userId) && x.Token == token
-                    && (!_options.TokenExpiredDays.HasValue || DateTime.Now <= x.ExpiredDate)).AnyAsync();
+                    && (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate)).AnyAsync();
             if (check)
             {
                 await Delete(x => x.Token == token);
                 return TokenResult.Success(await Add(userId));
             }
-            return TokenResult.Faild($"{token} not found");
+            return TokenResult.Failed($"{token} not found");
         }
 
         public async Task<string> OnChangePassword(TKey userId)
@@ -75,10 +80,10 @@ namespace EasyRefreshToken.Service
             => await Delete(x => true);
 
         public async Task<bool> ClearExpired()
-            => await Delete(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.Now);
+            => await Delete(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow);
 
         public async Task<bool> ClearExpired(TKey userId)
-            => await Delete(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.Now);
+            => await Delete(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow);
 
         public async Task<bool> Clear(TKey userId) => await Delete(x => x.UserId.Equals(userId));
     }
@@ -97,7 +102,7 @@ namespace EasyRefreshToken.Service
                 {
                     Token = _options.TokenGenerationMethod(),
                     UserId = userId,
-                    ExpiredDate = _options.TokenExpiredDays.HasValue ? DateTime.Now.AddDays(_options.TokenExpiredDays.Value) : null
+                    ExpiredDate = _options.TokenExpiredDays.HasValue ? DateTime.UtcNow.AddDays(_options.TokenExpiredDays.Value) : null
                 };
                 _context.Add(refreshToken);
                 if (_options.SaveChanges)
@@ -111,14 +116,14 @@ namespace EasyRefreshToken.Service
             }
         }
 
-        private async Task<bool> IsAccessToLimit(TKey userId, TUser user)
+        private async Task<bool> IsAccessToLimit(TUser user)
         {
             var limit = GetMaxNumberOfActiveDevicesPerUser(user);
-            return limit.HasValue && await GetNumberActiveTokens(userId) >= limit;
+            return limit.HasValue && await GetNumberActiveTokens(user.Id) >= limit;
         }
 
         private async Task<int> GetNumberActiveTokens(TKey userId)
-            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.Now)).CountAsync();
+            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow)).CountAsync();
 
         private async Task<bool> Delete(Expression<Func<RefreshToken<TUser, TKey>, bool>> filter)
         {
@@ -139,7 +144,8 @@ namespace EasyRefreshToken.Service
         }
 
         private async Task<string> GetOldestToken(TKey userId)
-            => await _context.Set<TRefreshToken>().Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
+            => await _context.Set<TRefreshToken>()
+            .Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
             .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
 
         private int? GetMaxNumberOfActiveDevicesPerUser(TUser user = default)
@@ -147,23 +153,25 @@ namespace EasyRefreshToken.Service
             if (_options.MaxNumberOfActiveDevices == null)
                 return null;
 
-            switch (_options.MaxNumberOfActiveDevices.type)
+            switch (_options.MaxNumberOfActiveDevices.Type)
             {
                 case MaxNumberOfActiveDevicesType.GlobalLimit:
-                    return _options.MaxNumberOfActiveDevices.globalLimit;
+                    return _options.MaxNumberOfActiveDevices.GlobalLimit;
 
                 case MaxNumberOfActiveDevicesType.LimitPerType:
-                    if (_options.MaxNumberOfActiveDevices.limitPerType.ContainsKey(user.GetType()))
-                        return _options.MaxNumberOfActiveDevices.limitPerType[user.GetType()];
+                    if (_options.MaxNumberOfActiveDevices.LimitPerType.TryGetValue(user.GetType(), out int value))
+                        return value;
                     break;
 
                 case MaxNumberOfActiveDevicesType.LimitPerProperty:
-                    var propName = _options.MaxNumberOfActiveDevices.limitPerProperty.Item1;
+                    var propName = _options.MaxNumberOfActiveDevices.LimitPerProperty.Item1;
                     var propValue = Helpers.GetPropertyValue(user, propName);
-                    if (propValue == null || !_options.MaxNumberOfActiveDevices.limitPerProperty.Item2.ContainsKey(propValue))
+                    if (propValue == null || !_options.MaxNumberOfActiveDevices.LimitPerProperty.Item2.ContainsKey(propValue))
                         return null;
-                    return _options.MaxNumberOfActiveDevices.limitPerProperty.Item2[propValue];
+
+                    return _options.MaxNumberOfActiveDevices.LimitPerProperty.Item2[propValue];
             }
+
             return null;
         }
     }

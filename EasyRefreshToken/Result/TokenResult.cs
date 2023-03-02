@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EasyRefreshToken.Result
+﻿namespace EasyRefreshToken.Result
 {
     /// <summary>
     /// Present some functions result
     /// </summary>
     public class TokenResult
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isSucceded"></param>
+        /// <param name="token"></param>
+        /// <param name="errorMessage"></param>
         public TokenResult(bool isSucceded = false, string token = null, string errorMessage = null)
         {
             IsSucceded = isSucceded;
@@ -33,12 +33,21 @@ namespace EasyRefreshToken.Result
         /// </summary>
         public string ErrorMessage { get; set; }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public static TokenResult Success(string token)
-            => new TokenResult(true, token);
+            => new(true, token);
 
-        public static TokenResult Faild(string errorMessage)
-            => new TokenResult(false, null, errorMessage);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="errorMessage"></param>
+        /// <returns></returns>
+        public static TokenResult Failed(string errorMessage)
+            => new(false, null, errorMessage);
     }
 
 }

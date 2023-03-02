@@ -9,6 +9,7 @@ namespace EasyRefreshTokenTest.Mock
         {
             DateCreated = DateTime.Now;
         }
+
         public DateTime DateCreated { get; set; }
     }
 }

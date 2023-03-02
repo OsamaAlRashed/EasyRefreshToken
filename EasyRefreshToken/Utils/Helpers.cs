@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 namespace EasyRefreshToken.Utils
 {
     /// <summary>
-    /// Helpers method
+    /// Represents Helper methods
     /// </summary>
     internal static class Helpers
     {

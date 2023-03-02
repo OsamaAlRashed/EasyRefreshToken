@@ -115,7 +115,7 @@ namespace EasyRefreshToken.DependencyInjection
         public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services,
             Action<RefreshTokenOptions> options = default)
             where TDbContext : DbContext
-            => services.AddRefreshToken<TDbContext, RefreshToken<IUser<string>, string>, IUser<string>, string>(options);
+            => services.AddRefreshToken<TDbContext, RefreshToken<IUser, string>, IUser, string>(options);
 
         /// <summary>
         /// Adds and configures refresh token service
@@ -125,6 +125,6 @@ namespace EasyRefreshToken.DependencyInjection
         /// <returns>The same service collection</returns>
         public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services)
             where TDbContext : DbContext
-            => services.AddRefreshToken<TDbContext, RefreshToken<IUser<string>, string>, IUser<string>, string>();
+            => services.AddRefreshToken<TDbContext, RefreshToken<IUser, string>, IUser, string>();
     }
 }
