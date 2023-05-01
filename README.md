@@ -1,5 +1,19 @@
 ### **EasyRefreshToken 1.0**
 
+
+  <table>
+  <tbody>
+
+  <tr> <td> 
+    <a href="https://www.nuget.org/packages/EasyRefreshToken/">
+      <img alt="Nuget" src="https://img.shields.io/nuget/dt/EasyRefreshToken?color=blue&label=EasyRefreshToken&logo=nuget&style=flate">
+    </a>
+  </td> 
+  </tr>
+    
+  </tbody>
+  <table>
+
 - .Net 7: 7.1.0
 - .Net 6: 6.1.0
 - .Net 5: 5.1.0
