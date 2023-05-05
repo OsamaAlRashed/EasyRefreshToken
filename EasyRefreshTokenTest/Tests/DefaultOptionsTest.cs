@@ -20,7 +20,7 @@ namespace EasyRefreshTokenTest.Tests
         AppDbContext context;
         public DefaultOptionsTest()
         { 
-            var provider = Startup.ConfigureService(default).BuildServiceProvider();
+            var provider = Startup.ConfigureService().BuildServiceProvider();
             tokenService = provider.GetRequiredService<ITokenService<Guid>>();
             context = provider.GetRequiredService<AppDbContext>();
         }

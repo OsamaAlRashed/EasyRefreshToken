@@ -21,63 +21,43 @@ namespace EasyRefreshToken.DependencyInjection
         /// <typeparam name="TKey"></typeparam>
         /// <param name="services"></param>
         /// <param name="options"></param>
+        /// <param name="lifetime"></param>
         /// <returns>The same service collection</returns>
         public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken, TUser, TKey>(
-            this IServiceCollection services, Action<RefreshTokenOptions> options)
+            this IServiceCollection services, 
+            Action<RefreshTokenOptions> options = default,
+            ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TDbContext : DbContext
             where TRefreshToken : RefreshToken<TUser, TKey>, new()
             where TUser : class, IUser<TKey>
             where TKey : IEquatable<TKey>
-            => services.Configure(options)
-                .AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
+        {
+            options ??= (option) => { };
 
-        /// <summary>
-        /// Adds and configures refresh token service
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <typeparam name="TRefreshToken"></typeparam>
-        /// <typeparam name="TUser"></typeparam>
-        /// <typeparam name="TKey"></typeparam>
-        /// <param name="services"></param>
-        /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken, TUser, TKey>(
-            this IServiceCollection services)
-            where TDbContext : DbContext
-            where TRefreshToken : RefreshToken<TUser, TKey>, new()
-            where TUser : class, IUser<TKey>
-            where TKey : IEquatable<TKey>
-            => services.AddScoped<ITokenService<TKey>, TokenService<TDbContext, TRefreshToken, TUser, TKey>>();
+            services.Configure(options)
+                .Add(new ServiceDescriptor(typeof(ITokenService<TKey>), typeof(TokenService<TDbContext, TRefreshToken, TUser, TKey>), lifetime));
+               
+            return services;
+        }
 
         /// <summary>
         /// Adds and configures refresh token service
         /// </summary>
         /// <param name="services"></param>
         /// <param name="options"></param>
+        /// <param name="lifetime"></param>
         /// <typeparam name="TDbContext"></typeparam>
         /// <typeparam name="TUser"></typeparam>
         /// <typeparam name="TKey"></typeparam>
         /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services,
-            Action<RefreshTokenOptions> options = default)
+        public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(
+            this IServiceCollection services,
+            Action<RefreshTokenOptions> options = default,
+            ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TDbContext : DbContext
             where TUser : class, IUser<TKey>
             where TKey : IEquatable<TKey>
-            => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>(options);
-
-        /// <summary> 
-        /// Adds and configures refresh token service
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <typeparam name="TUser"></typeparam>
-        /// <typeparam name="TKey"></typeparam>
-        /// <param name="services"></param>
-        /// <param name=""></param>
-        /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext, TUser, TKey>(this IServiceCollection services)
-            where TDbContext : DbContext
-            where TUser : class, IUser<TKey>
-            where TKey : IEquatable<TKey>
-            => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>();
+            => services.AddRefreshToken<TDbContext, RefreshToken<TUser, TKey>, TUser, TKey>(options, lifetime);
 
         /// <summary>
         /// Adds and configures refresh token service
@@ -86,45 +66,28 @@ namespace EasyRefreshToken.DependencyInjection
         /// <typeparam name="TRefreshToken"></typeparam>
         /// <param name="services"></param>
         /// <param name="options"></param>
+        /// <param name="lifetime"></param>
         /// <returns>The same service collection</returns>
         public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken>(this IServiceCollection services,
-            Action<RefreshTokenOptions> options = default)
+            Action<RefreshTokenOptions> options = default,
+            ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TDbContext : DbContext
             where TRefreshToken : RefreshToken<IUser<string>, string>, new()
-            => services.AddRefreshToken<TDbContext, TRefreshToken, IUser<string>, string>(options);
-
-        /// <summary>
-        /// Adds and configures refresh token service
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <typeparam name="TRefreshToken"></typeparam>
-        /// <param name="services"></param>
-        /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext, TRefreshToken>(this IServiceCollection services)
-            where TDbContext : DbContext
-            where TRefreshToken : RefreshToken<IUser<string>, string>, new()
-            => services.AddRefreshToken<TDbContext, TRefreshToken, IUser<string>, string>();
+            => services.AddRefreshToken<TDbContext, TRefreshToken, IUser<string>, string>(options, lifetime);
 
         /// <summary>
         /// Adds and configures refresh token service
         /// </summary>
         /// <typeparam name="TDbContext"></typeparam>
         /// <param name="services"></param>
+        /// <param name="lifetime"></param>
         /// <param name="options"></param>
         /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services,
-            Action<RefreshTokenOptions> options = default)
+        public static IServiceCollection AddRefreshToken<TDbContext>(
+            this IServiceCollection services,
+            Action<RefreshTokenOptions> options = default,
+            ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TDbContext : DbContext
-            => services.AddRefreshToken<TDbContext, RefreshToken<IUser, string>, IUser, string>(options);
-
-        /// <summary>
-        /// Adds and configures refresh token service
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <param name="services"></param>
-        /// <returns>The same service collection</returns>
-        public static IServiceCollection AddRefreshToken<TDbContext>(this IServiceCollection services)
-            where TDbContext : DbContext
-            => services.AddRefreshToken<TDbContext, RefreshToken<IUser, string>, IUser, string>();
+            => services.AddRefreshToken<TDbContext, RefreshToken<IUser, string>, IUser, string>(options, lifetime);
     }
 }

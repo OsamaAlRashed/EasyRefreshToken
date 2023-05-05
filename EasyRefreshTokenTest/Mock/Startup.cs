@@ -14,7 +14,7 @@ namespace EasyRefreshTokenTest.Mock
 
     public class Startup
     {
-        public static ServiceCollection ConfigureService(Action<RefreshTokenOptions> options)
+        public static ServiceCollection ConfigureService(Action<RefreshTokenOptions> options = default)
         {
             var services = new ServiceCollection();
 
