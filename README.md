@@ -21,7 +21,7 @@
 **What's new??** 
 - Specifies a life time of the Service.
 
-**Migrate to _.1._**
+**Migrate to < _.1.0**
 - You must make `TUser` inherit from `IUser`.
 - Change TokenService namespace to Service.
 
