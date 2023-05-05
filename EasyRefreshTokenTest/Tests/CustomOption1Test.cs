@@ -18,7 +18,7 @@ namespace EasyRefreshTokenTest.Tests
         {
             var provider = Startup.ConfigureService(op =>
             {
-                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Config(3);
+                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure(3);
                 op.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
                 op.TokenExpiredDays = null;
                 op.TokenGenerationMethod = () =>

@@ -20,7 +20,7 @@ namespace EasyRefreshTokenTest.Tests
         AppDbContext context;
         public DefaultOptionsTest()
         { 
-            var provider = Startup.ConfigureService(default).BuildServiceProvider();
+            var provider = Startup.ConfigureService().BuildServiceProvider();
             tokenService = provider.GetRequiredService<ITokenService<Guid>>();
             context = provider.GetRequiredService<AppDbContext>();
         }
@@ -176,7 +176,8 @@ namespace EasyRefreshTokenTest.Tests
 
             var tokenResult1 = await tokenService.OnLogin(user.Id);
 
-            var token = context.RefreshTokens.Where(x => x.Token == tokenResult1.Token).FirstOrDefault();
+            var token = context.RefreshTokens
+                .Where(x => x.Token == tokenResult1.Token).FirstOrDefault();
             token.ExpiredDate = token.ExpiredDate.Value.AddDays(-7);
             await context.SaveChangesAsync();
 

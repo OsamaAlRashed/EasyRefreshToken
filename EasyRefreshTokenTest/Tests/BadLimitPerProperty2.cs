@@ -18,7 +18,7 @@ namespace EasyRefreshTokenTest.Tests
         public async Task Setup_OutOfRangeException()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
-                MaxNumberOfActiveDevices.Config("asdsad", (UserType.Employee, -1), (UserType.Admin, 2)));
+                MaxNumberOfActiveDevices.Configure("asdsad", (UserType.Employee, -1), (UserType.Admin, 2)));
         }
 
         [Fact]
@@ -26,14 +26,14 @@ namespace EasyRefreshTokenTest.Tests
         public async Task Setup_ArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                MaxNumberOfActiveDevices.Config(null, (UserType.Employee, 1), (UserType.Admin, 2)));
+                MaxNumberOfActiveDevices.Configure(null, (UserType.Employee, 1), (UserType.Admin, 2)));
         }
 
         [Fact]
         public async Task Setup_Exception()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                MaxNumberOfActiveDevices.Config(null, (null, 1), (UserType.Admin, 2)));
+                MaxNumberOfActiveDevices.Configure(null, (null, 1), (UserType.Admin, 2)));
         }
     }
 }

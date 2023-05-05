@@ -22,7 +22,7 @@ namespace EasyRefreshTokenTest.Tests
         {
             var provider = Startup.ConfigureService(op =>
             {
-                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Config((typeof(SubUser1), 1), (typeof(SubUser2), 2));
+                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure((typeof(SubUser1), 1), (typeof(SubUser2), 2));
             }).BuildServiceProvider();
             tokenService = provider.GetRequiredService<ITokenService<Guid>>();
             context = provider.GetRequiredService<AppDbContext>();

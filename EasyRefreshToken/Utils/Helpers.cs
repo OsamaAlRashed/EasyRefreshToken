@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 namespace EasyRefreshToken.Utils
 {
     /// <summary>
-    /// Helpers method
+    /// Represents Helper methods
     /// </summary>
     internal static class Helpers
     {
@@ -31,10 +31,7 @@ namespace EasyRefreshToken.Utils
         internal static object GetPropertyValue(object @object, string propName)
         {
             var prop = @object.GetType().GetProperties().Where(x => x.Name.ToLower() == propName?.ToLower()).FirstOrDefault();
-            if (prop == null)
-                throw new ArgumentNullException("Property name not exist in the given object.");
-
-            return prop.GetValue(@object);
+            return prop == null ? throw new ArgumentNullException("Property name not exist in the given object.") : prop.GetValue(@object);
         }
     }
 }

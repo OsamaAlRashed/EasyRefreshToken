@@ -9,10 +9,10 @@ namespace EasyRefreshToken.DependencyInjection
     /// </summary>
     public class MaxNumberOfActiveDevices
     {
-        internal int? globalLimit;
-        internal Dictionary<Type, int> limitPerType;
-        internal ValueTuple<string, Dictionary<object, int>> limitPerProperty;
-        internal MaxNumberOfActiveDevicesType type;
+        internal int? GlobalLimit { get; set; }
+        internal Dictionary<Type, int> LimitPerType { get; set; }
+        internal ValueTuple<string, Dictionary<object, int>> LimitPerProperty { get; set; }
+        internal MaxNumberOfActiveDevicesType Type { get; set; }
         private MaxNumberOfActiveDevices() { }
 
         /// <summary>
@@ -20,14 +20,17 @@ namespace EasyRefreshToken.DependencyInjection
         /// </summary>
         /// <param name="limit"></param>
         /// <returns>New Instance from MaxNumberOfActiveDevices</returns>
-        public static MaxNumberOfActiveDevices Config(int limit)
+        public static MaxNumberOfActiveDevices Configure(int limit)
         {
             if(limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            var result = new MaxNumberOfActiveDevices();
-            result.type = MaxNumberOfActiveDevicesType.GlobalLimit;
-            result.globalLimit = limit;
+            var result = new MaxNumberOfActiveDevices
+            {
+                Type = MaxNumberOfActiveDevicesType.GlobalLimit,
+                GlobalLimit = limit
+            };
+
             return result;
         }
 
@@ -36,17 +39,20 @@ namespace EasyRefreshToken.DependencyInjection
         /// </summary>
         /// <param name="pairs">ValueTuble that present every type with limit it.</param>
         /// <returns>return new instance from <code>MaxNumberOfActiveDevices</code></returns>
-        public static MaxNumberOfActiveDevices Config(params (Type type, int limit)[] pairs)
+        public static MaxNumberOfActiveDevices Configure(params (Type type, int limit)[] pairs)
         {
-            var result = new MaxNumberOfActiveDevices();
-            result.type = MaxNumberOfActiveDevicesType.LimitPerType;
-            result.limitPerType = new Dictionary<Type, int>();
-            foreach (var pair in pairs)
+            var result = new MaxNumberOfActiveDevices
             {
-                if(pair.limit <= 0)
+                Type = MaxNumberOfActiveDevicesType.LimitPerType,
+                LimitPerType = new Dictionary<Type, int>()
+            };
+            foreach (var (type, limit) in pairs)
+            {
+                if(limit <= 0)
                     throw new ArgumentOutOfRangeException("limit");
-                result.limitPerType[pair.type] = pair.limit;
+                result.LimitPerType[type] = limit;
             }
+
             return result;
         }
 
@@ -56,22 +62,23 @@ namespace EasyRefreshToken.DependencyInjection
         /// <param name="propName"></param>
         /// <param name="pairs"></param>
         /// <returns></returns>
-        public static MaxNumberOfActiveDevices Config(string propName, params (object value, int limit)[] pairs)
+        public static MaxNumberOfActiveDevices Configure(string propName, params (object value, int limit)[] pairs)
         {
             if (propName == null)
-                throw new ArgumentNullException("property name can not bo null");
+                throw new ArgumentNullException("property name can not be null");
 
-            var result = new MaxNumberOfActiveDevices();
-            result.type = MaxNumberOfActiveDevicesType.LimitPerProperty;
-            result.limitPerProperty = new ValueTuple<string, Dictionary<object, int>>();
-            result.limitPerProperty.Item1 = propName;
-            result.limitPerProperty.Item2 = new();
-            foreach (var pair in pairs)
+            var result = new MaxNumberOfActiveDevices
             {
-                if (pair.limit <= 0)
+                Type = MaxNumberOfActiveDevicesType.LimitPerProperty,
+                LimitPerProperty = new ValueTuple<string, Dictionary<object, int>>(propName, new())
+            };
+            foreach (var (value, limit) in pairs)
+            {
+                if (limit <= 0)
                     throw new ArgumentOutOfRangeException("limit");
-                result.limitPerProperty.Item2[pair.value] = pair.limit;
+                result.LimitPerProperty.Item2[value] = limit;
             }
+
             return result;
         }
     }
