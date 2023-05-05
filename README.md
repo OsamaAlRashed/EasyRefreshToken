@@ -1,4 +1,4 @@
-### **EasyRefreshToken 1.0**
+### **EasyRefreshToken 1.1**
 
 
   <table>
@@ -14,15 +14,14 @@
   </tbody>
   <table>
 
-- .Net 7: 7.1.0
-- .Net 6: 6.1.0
-- .Net 5: 5.1.0
+- .Net 7: 7.1.1
+- .Net 6: 6.1.1
+- .Net 5: 5.1.1
 
 **What's new??** 
-- Remove dependencies on microsoft identity.
-- Add IUser intreface.
+- Specifies a life time of the Service.
 
-**Migrate to _.1.0**
+**Migrate to _.1._**
 - You must make `TUser` inherit from `IUser`.
 - Change TokenService namespace to Service.
 
