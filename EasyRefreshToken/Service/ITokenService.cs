@@ -4,30 +4,31 @@ using System.Threading.Tasks;
 namespace EasyRefreshToken.Service
 {
     /// <summary>
-    /// Service contains commonlly method to deal with refresh token 
+    /// Contains common methods to deal with the refresh token.
     /// </summary>
+    /// <typeparam name="TKey">The key of user</typeparam>
     public interface ITokenService<TKey>
     {
         /// <summary>
-        /// Adds new token for user
+        /// Adds new token for a specified user
         /// </summary>
-        /// <param name="userId">current user Id</param>
-        /// <returns>new refresh token</returns>
+        /// <param name="userId">Current user Id</param>
+        /// <returns>New refresh token</returns>
         Task<TokenResult> OnLogin(TKey userId);
 
         /// <summary>
         /// Delete token
         /// </summary>
-        /// <param name="token">current token</param>
-        /// <returns>true if success, false if faild</returns>
+        /// <param name="token">The refresh token</param>
+        /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
         Task<bool> OnLogout(string token);
 
         /// <summary>
-        /// Update refresh token
+        /// Updates the token for a specified user
         /// </summary>
-        /// <param name="userId">current user Id</param>
-        /// <param name="oldToken">current token</param>
-        /// <returns>new token</returns>
+        /// <param name="userId">Specified user Id</param>
+        /// <param name="oldToken">Refresh token</param>
+        /// <returns>New token</returns>
         Task<TokenResult> OnAccessTokenExpired(TKey userId, string oldToken);
 
         /// <summary>
@@ -38,28 +39,28 @@ namespace EasyRefreshToken.Service
         Task<string> OnChangePassword(TKey userId);
 
         /// <summary>
-        /// clear token table
+        /// Clears the token entity
         /// </summary>
-        /// <returns>true if success, false if faild</returns>
+        /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
         Task<bool> Clear();
 
         /// <summary>
-        /// clear Expired token table
+        /// Clears the expired token in the entity
         /// </summary>
-        /// <returns>true if success, false if faild</returns>
+        /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
         Task<bool> ClearExpired();
 
         /// <summary>
-        /// clear token for user
+        /// Clears the token entity for a specified user
         /// </summary>
-        /// <param name="userId">current user Id</param>
-        /// <returns></returns>
+        /// <param name="userId">Specified user Id</param>
+        /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
         Task<bool> Clear(TKey userId);
         /// <summary>
-        /// clear Expired token for user
+        /// Clears the expired token in the entity for a specified user
         /// </summary>
-        /// <param name="userId">current user Id</param>
-        /// <returns></returns>
+        /// <param name="userId">Specified user Id</param>
+        /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
         Task<bool> ClearExpired(TKey userId);
     }
 }

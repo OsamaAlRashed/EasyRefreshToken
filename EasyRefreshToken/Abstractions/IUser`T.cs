@@ -1,7 +1,7 @@
 ﻿namespace EasyRefreshToken.Abstractions
 {
     /// <summary>
-    /// Represents User Entity
+    /// Represents a user interface
     /// </summary>
     /// <typeparam name="TKey">Represents the key of the entity</typeparam>
     public interface IUser<TKey>
