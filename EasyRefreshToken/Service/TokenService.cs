@@ -28,64 +28,68 @@ namespace EasyRefreshToken.Service
             _options = options?.Value ?? new RefreshTokenOptions();
         }
 
-        public async Task<TokenResult> OnLogin(TKey userId)
+        public async Task<TokenResult> OnLoginAsync(TKey userId)
         {
             var user = await _context.Set<TUser>()
                 .Where(x => x.Id.Equals(userId))
                 .SingleOrDefaultAsync();
 
             if (user == null)
-                return TokenResult.Failed($"User with id {userId} not found.");
+                return TokenResult.SetFailed($"User with id {userId} not found.", 404);
 
             if (await IsAccessToLimit(user))
             {
                 var oldedToken = await GetOldestToken(userId);
                 if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
-                    return TokenResult.Failed("Login not allowed because access to max number of active devices.");
+                    return TokenResult.SetFailed("Login not allowed because access to max number of active devices.", 401);
 
                 await Delete(x => x.Token == oldedToken);
             }
 
-            return TokenResult.Success(await Add(userId));
+            return TokenResult.SetSuccess(await Add(userId));
         }
 
-        public async Task<bool> OnLogout(string oldToken) => await Delete(x => x.Token == oldToken);
+        public async Task<bool> OnLogoutAsync(string oldToken) => await Delete(x => x.Token == oldToken);
 
-        public async Task<TokenResult> OnAccessTokenExpired(TKey userId, string token)
+        public async Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string token)
         {
             var user = await _context.Set<TUser>().SingleOrDefaultAsync(x => x.Id.Equals(userId));
             if (user == null)
-                return TokenResult.Failed($"User with id {userId} not found");
+                return TokenResult.SetFailed($"User with id {userId} not found", 404);
 
             var check = await _context.Set<TRefreshToken>()
                 .Where(x => x.UserId.Equals(userId) && x.Token == token
-                    && (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate)).AnyAsync();
+                    && (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate))
+                .AnyAsync();
+
             if (check)
             {
                 await Delete(x => x.Token == token);
-                return TokenResult.Success(await Add(userId));
+                return TokenResult.SetSuccess(await Add(userId));
             }
-            return TokenResult.Failed($"{token} not found");
+
+            return TokenResult.SetFailed( $"{token} not found", 404);
         }
 
-        public async Task<string> OnChangePassword(TKey userId)
+        public async Task<string> OnChangePasswordAsync(TKey userId)
         {
             await Delete(x => x.UserId.Equals(userId));
             if (_options.OnChangePasswordBehavior == OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
                 return await Add(userId);
-            return "";
+
+            return null;
         }
 
-        public async Task<bool> Clear()
+        public async Task<bool> ClearAsync()
             => await Delete(x => true);
 
-        public async Task<bool> ClearExpired()
+        public async Task<bool> ClearExpiredAsync()
             => await Delete(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow);
 
-        public async Task<bool> ClearExpired(TKey userId)
+        public async Task<bool> ClearExpiredAsync(TKey userId)
             => await Delete(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow);
 
-        public async Task<bool> Clear(TKey userId) => await Delete(x => x.UserId.Equals(userId));
+        public async Task<bool> ClearAsync(TKey userId) => await Delete(x => x.UserId.Equals(userId));
     }
 
     internal partial class TokenService<TDbContext, TRefreshToken, TUser, TKey> : ITokenService<TKey>
@@ -96,24 +100,17 @@ namespace EasyRefreshToken.Service
     {
         private async Task<string> Add(TKey userId)
         {
-            try
+            var refreshToken = new TRefreshToken()
             {
-                var refreshToken = new TRefreshToken()
-                {
-                    Token = _options.TokenGenerationMethod(),
-                    UserId = userId,
-                    ExpiredDate = _options.TokenExpiredDays.HasValue ? DateTime.UtcNow.AddDays(_options.TokenExpiredDays.Value) : null
-                };
-                _context.Add(refreshToken);
-                if (_options.SaveChanges)
-                    await _context.SaveChangesAsync();
+                Token = _options.TokenGenerationMethod(),
+                UserId = userId,
+                ExpiredDate = _options.TokenExpiredDays.HasValue ? DateTime.UtcNow.AddDays(_options.TokenExpiredDays.Value) : null
+            };
+            _context.Add(refreshToken);
+            if (_options.SaveChanges)
+                await _context.SaveChangesAsync();
 
-                return refreshToken.Token;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return refreshToken.Token;
         }
 
         private async Task<bool> IsAccessToLimit(TUser user)
@@ -127,26 +124,21 @@ namespace EasyRefreshToken.Service
 
         private async Task<bool> Delete(Expression<Func<RefreshToken<TUser, TKey>, bool>> filter)
         {
-            try
-            {
-                var oldRefreshTokens = await _context.Set<TRefreshToken>().Where(filter).ToListAsync();
-                if (!oldRefreshTokens.Any())
-                    return false;
-                _context.RemoveRange(oldRefreshTokens);
-                if (_options.SaveChanges)
-                    await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            var oldRefreshTokens = await _context.Set<TRefreshToken>().Where(filter).ToListAsync();
+            if (!oldRefreshTokens.Any())
+                return false;
+
+            _context.RemoveRange(oldRefreshTokens);
+            if (_options.SaveChanges)
+                await _context.SaveChangesAsync();
+
+            return true;
         }
 
         private async Task<string> GetOldestToken(TKey userId)
             => await _context.Set<TRefreshToken>()
-            .Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
-            .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
+                .Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
+                .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
 
         private int? GetMaxNumberOfActiveDevicesPerUser(TUser user = default)
         {
@@ -174,5 +166,6 @@ namespace EasyRefreshToken.Service
 
             return null;
         }
+
     }
 }

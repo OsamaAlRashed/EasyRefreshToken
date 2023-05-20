@@ -1,14 +1,9 @@
 ﻿using EasyRefreshToken.Service;
 using EasyRefreshTokenTest.Mock;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -16,23 +11,24 @@ namespace EasyRefreshTokenTest.Tests
 {
     public class DefaultOptionsTest
     {
-        ITokenService<Guid> tokenService;
-        AppDbContext context;
+        private readonly ITokenService<Guid> _tokenService;
+        private readonly AppDbContext _context;
+
         public DefaultOptionsTest()
         { 
             var provider = Startup.ConfigureService().BuildServiceProvider();
-            tokenService = provider.GetRequiredService<ITokenService<Guid>>();
-            context = provider.GetRequiredService<AppDbContext>();
+            _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
+            _context = provider.GetRequiredService<AppDbContext>();
         }
 
         [Fact]
         public async Task OnLogin_Ok()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user1 = await util.GenerateUser();
 
             //1
-            var tokenResult = await tokenService.OnLogin(user1.Id);
+            var tokenResult = await _tokenService.OnLoginAsync(user1.Id);
 
             Assert.True(tokenResult.IsSucceded);
         }
@@ -40,7 +36,7 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnLogin_UserNotFound()
         {
-            var tokenResult = await tokenService.OnLogin(Guid.NewGuid());
+            var tokenResult = await _tokenService.OnLoginAsync(Guid.NewGuid());
 
             Assert.False(tokenResult.IsSucceded);
         }
@@ -48,16 +44,16 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnLogin_LimitOK()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult1 = await tokenService.OnLogin(user.Id); //1
-            var tokenResult2 = await tokenService.OnLogin(user.Id); //2
-            var tokenResult3 = await tokenService.OnLogin(user.Id); //3
-            var tokenResult4 = await tokenService.OnLogin(user.Id); //4
-            var tokenResult5 = await tokenService.OnLogin(user.Id); //5
-            var tokenResult6 = await tokenService.OnLogin(user.Id); //6
-            var tokenResult7 = await tokenService.OnLogin(user.Id); //7
+            var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
+            var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
+            var tokenResult3 = await _tokenService.OnLoginAsync(user.Id); //3
+            var tokenResult4 = await _tokenService.OnLoginAsync(user.Id); //4
+            var tokenResult5 = await _tokenService.OnLoginAsync(user.Id); //5
+            var tokenResult6 = await _tokenService.OnLoginAsync(user.Id); //6
+            var tokenResult7 = await _tokenService.OnLoginAsync(user.Id); //7
 
             var finalResult = tokenResult1.IsSucceded
                 && tokenResult2.IsSucceded
@@ -73,12 +69,12 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnLogout()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult = await tokenService.OnLogin(user.Id);
+            var tokenResult = await _tokenService.OnLoginAsync(user.Id);
 
-            var isSucceded = await tokenService.OnLogout(tokenResult.Token);
+            var isSucceded = await _tokenService.OnLogoutAsync(tokenResult.Token);
 
             Assert.True(isSucceded);
         }
@@ -86,24 +82,24 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnAccessTokenExpired()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
-            var tokenResult1 = await tokenService.OnLogin(user.Id);
-            var tokenResult2 = await tokenService.OnAccessTokenExpired(user.Id, tokenResult1.Token);
+            var tokenResult1 = await _tokenService.OnLoginAsync(user.Id);
+            var tokenResult2 = await _tokenService.OnAccessTokenExpiredAsync(user.Id, tokenResult1.Token);
             Assert.True(tokenResult2.IsSucceded);
         }
 
         [Fact]
         public async Task OnAccessTokenExpired_AfterLogout()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult1 = await tokenService.OnLogin(user.Id);
+            var tokenResult1 = await _tokenService.OnLoginAsync(user.Id);
 
-            await tokenService.OnLogout(tokenResult1.Token);
+            await _tokenService.OnLogoutAsync(tokenResult1.Token);
 
-            var tokenResult2 = await tokenService.OnAccessTokenExpired(user.Id, tokenResult1.Token);
+            var tokenResult2 = await _tokenService.OnAccessTokenExpiredAsync(user.Id, tokenResult1.Token);
 
             Assert.False(tokenResult2.IsSucceded);
         }
@@ -111,14 +107,14 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task ClearByUserId()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            await tokenService.OnLogin(user.Id);
+            await _tokenService.OnLoginAsync(user.Id);
 
-            await tokenService.Clear(user.Id);
+            await _tokenService.ClearAsync(user.Id);
 
-            var isExist = await context.RefreshTokens.Where(x => x.UserId == user.Id).AnyAsync();
+            var isExist = await _context.RefreshTokens.Where(x => x.UserId == user.Id).AnyAsync();
 
             Assert.False(isExist);
         }
@@ -126,16 +122,16 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task Clear()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user1 = await util.GenerateUser();
             var user2 = await util.GenerateUser();
 
-            await tokenService.OnLogin(user1.Id);
-            await tokenService.OnLogin(user2.Id);
+            await _tokenService.OnLoginAsync(user1.Id);
+            await _tokenService.OnLoginAsync(user2.Id);
 
-            await tokenService.Clear();
+            await _tokenService.ClearAsync();
 
-            var isExist = await context.RefreshTokens.AnyAsync();
+            var isExist = await _context.RefreshTokens.AnyAsync();
 
             Assert.False(isExist);
         }
@@ -143,27 +139,27 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnChangePassword()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult = await tokenService.OnLogin(user.Id);
+            var tokenResult = await _tokenService.OnLoginAsync(user.Id);
 
-            var result = await tokenService.OnChangePassword(user.Id);
+            var result = await _tokenService.OnChangePasswordAsync(user.Id);
 
-            Assert.Equal("", result);
+            Assert.Equal(null, result);
         }
 
         [Fact]
         public async Task OnAccessTokenExpired_After_OnChangePassword()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult1 = await tokenService.OnLogin(user.Id);
+            var tokenResult1 = await _tokenService.OnLoginAsync(user.Id);
 
-            await tokenService.OnChangePassword(user.Id);
+            await _tokenService.OnChangePasswordAsync(user.Id);
 
-            var tokenResult2 = await tokenService.OnAccessTokenExpired(user.Id, tokenResult1.Token);
+            var tokenResult2 = await _tokenService.OnAccessTokenExpiredAsync(user.Id, tokenResult1.Token);
 
             Assert.False(tokenResult2.IsSucceded);
         }
@@ -171,17 +167,17 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnAccessTokenExpired_By_RefreshTokenExpired()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult1 = await tokenService.OnLogin(user.Id);
+            var tokenResult1 = await _tokenService.OnLoginAsync(user.Id);
 
-            var token = context.RefreshTokens
+            var token = _context.RefreshTokens
                 .Where(x => x.Token == tokenResult1.Token).FirstOrDefault();
             token.ExpiredDate = token.ExpiredDate.Value.AddDays(-7);
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            var tokenResult2 = await tokenService.OnAccessTokenExpired(user.Id, tokenResult1.Token);
+            var tokenResult2 = await _tokenService.OnAccessTokenExpiredAsync(user.Id, tokenResult1.Token);
 
             Assert.False(tokenResult2.IsSucceded);
         }

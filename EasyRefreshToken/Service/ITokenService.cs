@@ -14,14 +14,14 @@ namespace EasyRefreshToken.Service
         /// </summary>
         /// <param name="userId">Current user Id</param>
         /// <returns>New refresh token</returns>
-        Task<TokenResult> OnLogin(TKey userId);
+        Task<TokenResult> OnLoginAsync(TKey userId);
 
         /// <summary>
         /// Delete token
         /// </summary>
         /// <param name="token">The refresh token</param>
         /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
-        Task<bool> OnLogout(string token);
+        Task<bool> OnLogoutAsync(string token);
 
         /// <summary>
         /// Updates the token for a specified user
@@ -29,38 +29,38 @@ namespace EasyRefreshToken.Service
         /// <param name="userId">Specified user Id</param>
         /// <param name="oldToken">Refresh token</param>
         /// <returns>New token</returns>
-        Task<TokenResult> OnAccessTokenExpired(TKey userId, string oldToken);
+        Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken);
 
         /// <summary>
         /// this method shoud be called by Change Password
         /// </summary>
         /// <param name="userId">current user Id</param>
         /// <returns>It depends on OnChangePasswordBehavior option</returns>
-        Task<string> OnChangePassword(TKey userId);
+        Task<string> OnChangePasswordAsync(TKey userId);
 
         /// <summary>
         /// Clears the token entity
         /// </summary>
         /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
-        Task<bool> Clear();
+        Task<bool> ClearAsync();
 
         /// <summary>
         /// Clears the expired token in the entity
         /// </summary>
         /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
-        Task<bool> ClearExpired();
+        Task<bool> ClearExpiredAsync();
 
         /// <summary>
         /// Clears the token entity for a specified user
         /// </summary>
         /// <param name="userId">Specified user Id</param>
         /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
-        Task<bool> Clear(TKey userId);
+        Task<bool> ClearAsync(TKey userId);
         /// <summary>
         /// Clears the expired token in the entity for a specified user
         /// </summary>
         /// <param name="userId">Specified user Id</param>
         /// <returns>Returns a Boolean value to determine if the operation succeeded</returns>
-        Task<bool> ClearExpired(TKey userId);
+        Task<bool> ClearExpiredAsync(TKey userId);
     }
 }

@@ -1,17 +1,11 @@
 ﻿using EasyRefreshToken.DependencyInjection;
-using EasyRefreshToken.Utils;
-using EasyRefreshTokenTest.Mock;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace EasyRefreshTokenTest.Mock
 {
-
     public class Startup
     {
         public static ServiceCollection ConfigureService(Action<RefreshTokenOptions> options = default)

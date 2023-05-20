@@ -1,23 +1,12 @@
-﻿namespace EasyRefreshToken.Result
+﻿using System;
+
+namespace EasyRefreshToken.Result
 {
     /// <summary>
     /// Present some functions result
     /// </summary>
     public class TokenResult
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="isSucceded"></param>
-        /// <param name="token"></param>
-        /// <param name="errorMessage"></param>
-        public TokenResult(bool isSucceded = false, string token = null, string errorMessage = null)
-        {
-            IsSucceded = isSucceded;
-            Token = token;
-            ErrorMessage = errorMessage;
-        }
-
         /// <summary>
         /// if IsSucceded true then the process ok.
         /// </summary>
@@ -29,25 +18,56 @@
         public string Token { get; set; }
 
         /// <summary>
+        /// Code
+        /// </summary>
+        public int Code { get; set; }
+
+        /// <summary>
         /// Error message (if there)
         /// </summary>
         public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Exception
+        /// </summary>
+        public Exception Exception { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static TokenResult Success(string token)
-            => new(true, token);
-
+        public static TokenResult SetSuccess(string token) => new ()
+        {
+            IsSucceded = true,
+            Token = token
+        };
         /// <summary>
         /// 
         /// </summary>
         /// <param name="errorMessage"></param>
+        /// <param name="code"></param>
         /// <returns></returns>
-        public static TokenResult Failed(string errorMessage)
-            => new(false, null, errorMessage);
+        public static TokenResult SetFailed(string errorMessage, int code = 400) => new()
+        {
+            ErrorMessage = errorMessage,
+            IsSucceded = false,
+            Code = code,
+        };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static TokenResult SetException(Exception exception, int code = 500) => new()
+        {
+            Code = code,
+            Exception = exception,
+            ErrorMessage = exception.Message,
+            IsSucceded = false
+        };
     }
 
 }

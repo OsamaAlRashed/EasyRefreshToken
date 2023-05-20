@@ -11,27 +11,28 @@ namespace EasyRefreshTokenTest.Tests
 {
     public class SaveChangesPropertyTest
     {
-        ITokenService<Guid> tokenService;
-        AppDbContext context;
+        private readonly ITokenService<Guid> _tokenService;
+        private readonly AppDbContext _context;
+
         public SaveChangesPropertyTest()
         {
             var provider = Startup.ConfigureService(op =>
             {
                 op.SaveChanges = false;
             }).BuildServiceProvider();
-            tokenService = provider.GetRequiredService<ITokenService<Guid>>();
-            context = provider.GetRequiredService<AppDbContext>();
+            _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
+            _context = provider.GetRequiredService<AppDbContext>();
         }
 
         [Fact]
         public async Task OnLogin_WithoutSaveChanges()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult = await tokenService.OnLogin(user.Id);
+            var tokenResult = await _tokenService.OnLoginAsync(user.Id);
 
-            var isExist = await context.RefreshTokens.Where(x => x.Token == tokenResult.Token).AnyAsync();
+            var isExist = await _context.RefreshTokens.Where(x => x.Token == tokenResult.Token).AnyAsync();
 
             Assert.False(isExist);
         }
@@ -39,13 +40,13 @@ namespace EasyRefreshTokenTest.Tests
         [Fact]
         public async Task OnLogin_WithSaveChanges()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            var tokenResult = await tokenService.OnLogin(user.Id);
-            await context.SaveChangesAsync();
+            var tokenResult = await _tokenService.OnLoginAsync(user.Id);
+            await _context.SaveChangesAsync();
 
-            var isExist = await context.RefreshTokens.Where(x => x.Token == tokenResult.Token).AnyAsync();
+            var isExist = await _context.RefreshTokens.Where(x => x.Token == tokenResult.Token).AnyAsync();
 
             Assert.True(isExist);
         }
