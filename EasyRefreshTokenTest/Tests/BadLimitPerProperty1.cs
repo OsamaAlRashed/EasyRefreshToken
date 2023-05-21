@@ -1,12 +1,8 @@
 ﻿using EasyRefreshToken.DependencyInjection;
-using EasyRefreshToken.Result;
 using EasyRefreshToken.Service;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -14,8 +10,9 @@ namespace EasyRefreshTokenTest.Tests
 {
     public class BadLimitPerProperty1
     {
-        ITokenService<Guid> tokenService;
-        AppDbContext context;
+        private readonly ITokenService<Guid> _tokenService;
+        private readonly AppDbContext _context;
+
         public BadLimitPerProperty1()
         {
             var provider = Startup.ConfigureService(op =>
@@ -23,18 +20,18 @@ namespace EasyRefreshTokenTest.Tests
                 op.MaxNumberOfActiveDevices = 
                     MaxNumberOfActiveDevices.Configure("BadUserType", (UserType.Employee, 1), (UserType.Admin, 2));
             }).BuildServiceProvider();
-            tokenService = provider.GetRequiredService<ITokenService<Guid>>();
-            context = provider.GetRequiredService<AppDbContext>();
+            _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
+            _context = provider.GetRequiredService<AppDbContext>();
         }
 
         [Fact]
         public async Task OnLoginUser()
         {
-            Utils util = new Utils(context);
+            Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async ()
-                => await tokenService.OnLogin(user.Id));
+                => await _tokenService.OnLoginAsync(user.Id));
         }
     }
 }
