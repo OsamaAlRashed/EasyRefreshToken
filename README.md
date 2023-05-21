@@ -1,4 +1,4 @@
-### **EasyRefreshToken 1.1**
+### **EasyRefreshToken 1.2**
 
 
   <table>
@@ -14,20 +14,13 @@
   </tbody>
   <table>
 
-- .Net 7: 7.1.1
-- .Net 6: 6.1.1
-- .Net 5: 5.1.1
-
-**What's new??** 
-- Specifies a life time of the Service.
-
-**Migrate to < _.1.0**
-- You must make `TUser` inherit from `IUser`.
-- Change TokenService namespace to Service.
+- .Net 7: 7.1.2
+- .Net 6: 6.1.2
+- .Net 5: 5.1.2
 
 **Documentation** 
-
-- Create your own class "MyRefreshToken" and add to it the properties you want and make it inherit from `RefreshToken<TUser, TKey>`
+- Make your `TUser` inherit from `IUser`.
+- Create your own class `MyRefreshToken` and add to it the properties you want and make it inherit from `RefreshToken<TUser, TKey>`
 - If you do not want to add new features, you can skip the previous step.
 
 - In AppDbContext Class:
@@ -43,14 +36,14 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   `Add-Migration`
   `Update-Database`
 
-- Now you can use **ITokenService<TKey>** that contains:
+- Now you can use `ITokenService<TKey>` that contains:
 
-  - `OnLogin`
-  - `OnLogout`
-  - `OnAccessTokenExpired`
-  - `OnChangePassword`
-  - `Clear`
-  - `ClearExpired`
+  - `OnLoginAsync`
+  - `OnLogoutAsync`
+  - `OnAccessTokenExpiredAsync`
+  - `OnChangePasswordAsync`
+  - `ClearAsync`
+  - `ClearExpiredAsync`
 
 - And you can control with many options:
 
@@ -61,6 +54,8 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
   - `OnChangePasswordBehavior`
   - `SaveChanges`
 
+- You can specifies a life time of the Service (the default is Scoped).
+    
 - For `MaxNumberOfActiveDevices` use `MaxNumberOfActiveDevices.Config()`.
    
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
