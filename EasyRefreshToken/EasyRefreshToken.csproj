@@ -11,11 +11,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Refresh_Package.png</PackageIcon>
     <ApplicationIcon>Refresh_Package.ico</ApplicationIcon>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="Refresh_Package.ico" />
-  </ItemGroup>
+   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\README.md">

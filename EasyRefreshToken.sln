@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshToken", "EasyRef
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshTokenTest", "EasyRefreshTokenTest\EasyRefreshTokenTest.csproj", "{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRefreshToken.InMemoryCache", "EasyRefreshToken.InMemoryCache\EasyRefreshToken.InMemoryCache.csproj", "{F2D30315-780F-47F7-BA1A-EE8A43B26AED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRefreshToken.EFCore", "EasyRefreshToken.EFCore\EasyRefreshToken.EFCore.csproj", "{36D3E2AD-6869-4231-AC2E-F4EF404CF175}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2D30315-780F-47F7-BA1A-EE8A43B26AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2D30315-780F-47F7-BA1A-EE8A43B26AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2D30315-780F-47F7-BA1A-EE8A43B26AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2D30315-780F-47F7-BA1A-EE8A43B26AED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36D3E2AD-6869-4231-AC2E-F4EF404CF175}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36D3E2AD-6869-4231-AC2E-F4EF404CF175}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36D3E2AD-6869-4231-AC2E-F4EF404CF175}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36D3E2AD-6869-4231-AC2E-F4EF404CF175}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
