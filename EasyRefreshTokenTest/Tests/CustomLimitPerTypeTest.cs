@@ -1,5 +1,5 @@
 ﻿using EasyRefreshToken.DependencyInjection;
-using EasyRefreshToken.Service;
+using EasyRefreshToken;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.Extensions.DependencyInjection;
 using System;

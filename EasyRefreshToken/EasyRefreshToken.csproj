@@ -10,7 +10,6 @@
     <Description>Package for manage refresh token with EF core</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Refresh_Package.png</PackageIcon>
-    <ApplicationIcon>Refresh_Package.ico</ApplicationIcon>
    </PropertyGroup>
 
   <ItemGroup>

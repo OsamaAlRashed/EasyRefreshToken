@@ -1,4 +1,4 @@
-﻿using EasyRefreshToken.Service;
+﻿using EasyRefreshToken;
 using EasyRefreshTokenTest.Mock;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

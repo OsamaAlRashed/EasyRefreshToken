@@ -56,7 +56,7 @@ or `builder.Services.AddRefreshToken<AppDbContext, MyRefreshToken, TUser, TKey>(
 
 - You can specifies a life time of the Service (the default is Scoped).
     
-- For `MaxNumberOfActiveDevices` use `MaxNumberOfActiveDevices.Config()`.
+- For `MaxNumberOfActiveDevices` use `MaxNumberOfActiveDevices.Configure()`.
    
 - Note: when change on options, I highly recommend cleaning the table by `Clear`
 
