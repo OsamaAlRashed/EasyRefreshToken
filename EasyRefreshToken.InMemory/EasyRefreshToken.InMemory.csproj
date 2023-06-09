@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>7.2.0</Version>
+		<Authors>Osama Al-Rashed</Authors>
+		<Company>None</Company>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Description>Package for manage refresh token</Description>
+		<PackageIcon>Refresh_Package.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Update="Refresh_Package.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\EasyRefreshToken\EasyRefreshToken.csproj" />
+	</ItemGroup>
+
+</Project>
