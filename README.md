@@ -16,6 +16,7 @@ It support .Net5, .Net6, and .Net7
 
 - Automatic management of refresh tokens and token expiration.
 - Flexible options for configuring token behavior, such as token expiration duration and preventing simultaneous logins.
+- Determine the number of tokens for each user according to global limit, its type or one of its properties.
 - Support for different storage mechanisms, including in-memory and Entity Framework Core.
 - Customizable token generation methods.
 - Integration with ASP.NET Core Identity.
@@ -123,6 +124,11 @@ public async Task<LoginResponse> Login(LoginDto dto)
   - `Func<string> TokenGenerationMethod`: Sets the method used for generating tokens.
   - `OnChangePasswordBehavior OnChangePasswordBehavior`: Sets the behavior of the OnChangePassword method. Default value is OnChangePasswordBehavior.DeleteAllTokens.
   - `MaxNumberOfActiveDevices MaxNumberOfActiveDevices`: Sets the maximum number of active devices per user type. If a type is not specified, the default value is `int.MaxValue`
+
+**MaxNumberOfActiveDevices**
+ - Global Limit: `MaxNumberOfActiveDevices.Configure(int.MaxValue)`
+ - Limit Per Type: `MaxNumberOfActiveDevices.Configure((typeof(Admin), 1), (typeof(Employee), 2))`
+ - Limit Per Property: `MaxNumberOfActiveDevices.Configure("UserType", (UserType.Admin, 1), (UserType.Employee, 2))`
 
 **Notes**
 
