@@ -1,48 +1,39 @@
-﻿using EasyRefreshToken.DependencyInjection.Enums;
-using EasyRefreshToken.Utils;
+﻿using EasyRefreshToken.Utils;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace EasyRefreshToken.DependencyInjection
 {
     /// <summary>
-    /// Options to control on token service
+    /// Options to control the behavior of the token service.
     /// </summary>
     public class RefreshTokenOptions
     {
         /// <summary>
-        /// The number of days until the token expires, if set null, the code will never expire.
-        /// Default value is 7 days
+        /// Gets or sets the number of days until the token expires. If set to null, the token will never expire. Default value is 7 days.
         /// </summary>
         [Range(1, int.MaxValue)]
         public int? TokenExpiredDays { get; set; } = 7;
 
         /// <summary>
-        /// If set true and there is valid token, then login operation will be prevent.
-        /// If set false, then old token will be removed and add a new token  
-        /// Default value is true
+        /// Gets or sets a value indicating whether to prevent login operation when the maximum number of active devices is reached. If set to true and there is a valid token, login will be prevented. If set to false, the old token will be removed and a new token will be added. Default value is true.
         /// </summary>
         public bool PreventingLoginWhenAccessToMaxNumberOfActiveDevices { get; set; } = true;
 
         /// <summary>
-        /// Determination generation method
+        /// Gets or sets the method used for generating tokens.
         /// </summary>
-        public Func<string> TokenGenerationMethod { get; set; } = () => Helpers.GenerateRefreshToken();
+        public Func<string> TokenGenerationMethod { get; set; } = Helpers.GenerateRefreshToken;
 
         /// <summary>
-        /// Determination OnChangePassword Method Behavior
-        /// Dfault value is OnChangePasswordBehavior.DeleteAllTokens
+        /// Gets or sets the behavior of the OnChangePassword method. Default value is OnChangePasswordBehavior.DeleteAllTokens.
         /// </summary>
         public OnChangePasswordBehavior OnChangePasswordBehavior { get; set; } = OnChangePasswordBehavior.DeleteAllTokens;
 
         /// <summary>
-        /// Max number Of active devices per every type of user, if type not set will take <code>MaxNumberOfActiveDevices</code> option.
+        /// Gets or sets the maximum number of active devices per user type. If a type is not specified, the default value from <see cref="MaxNumberOfActiveDevices"/> will be used.
         /// </summary>
         public MaxNumberOfActiveDevices MaxNumberOfActiveDevices { get; set; }
-
-        /// <summary>
-        /// Save changes in database automaticlly, the default value is true.
-        /// </summary>
-        public bool SaveChanges { get; set; } = true;
+            = MaxNumberOfActiveDevices.Configure(int.MaxValue);
     }
 }

@@ -1,73 +1,73 @@
 ﻿using System;
 
-namespace EasyRefreshToken.Result
+namespace EasyRefreshToken
 {
     /// <summary>
-    /// Present some functions result
+    /// Represents the result of a token operation.
     /// </summary>
     public class TokenResult
     {
         /// <summary>
-        /// if IsSucceded true then the process ok.
+        /// Gets or sets a value indicating whether the process was successful.
         /// </summary>
-        public bool IsSucceded { get; set; }
+        public bool IsSucceeded { get; set; }
 
         /// <summary>
-        /// new refersh token
+        /// Gets or sets the new refresh token.
         /// </summary>
         public string Token { get; set; }
 
         /// <summary>
-        /// Code
+        /// Gets or sets the result code.
         /// </summary>
         public int Code { get; set; }
 
         /// <summary>
-        /// Error message (if there)
+        /// Gets or sets the error message, if any.
         /// </summary>
         public string ErrorMessage { get; set; }
 
         /// <summary>
-        /// Exception
+        /// Gets or sets the exception that occurred, if any.
         /// </summary>
         public Exception Exception { get; set; }
 
         /// <summary>
-        /// 
+        /// Creates a successful token result with the specified token.
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public static TokenResult SetSuccess(string token) => new ()
+        /// <param name="token">The new refresh token.</param>
+        /// <returns>A new instance of <see cref="TokenResult"/> representing a successful result.</returns>
+        public static TokenResult SetSuccess(string token) => new TokenResult
         {
-            IsSucceded = true,
+            IsSucceeded = true,
             Token = token
         };
+
         /// <summary>
-        /// 
+        /// Creates a failed token result with the specified error message and code.
         /// </summary>
-        /// <param name="errorMessage"></param>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        public static TokenResult SetFailed(string errorMessage, int code = 400) => new()
+        /// <param name="errorMessage">The error message.</param>
+        /// <param name="code">The error code (default is 400).</param>
+        /// <returns>A new instance of <see cref="TokenResult"/> representing a failed result.</returns>
+        public static TokenResult SetFailed(string errorMessage, int code = 400) => new TokenResult
         {
-            ErrorMessage = errorMessage,
-            IsSucceded = false,
+            IsSucceeded = false,
             Code = code,
+            ErrorMessage = errorMessage
         };
 
         /// <summary>
-        /// 
+        /// Creates an exception token result with the specified exception and code.
         /// </summary>
-        /// <param name="exception"></param>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        public static TokenResult SetException(Exception exception, int code = 500) => new()
+        /// <param name="exception">The exception that occurred.</param>
+        /// <param name="code">The error code (default is 500).</param>
+        /// <returns>A new instance of <see cref="TokenResult"/> representing an exception result.</returns>
+        public static TokenResult SetException(Exception exception, int code = 500) => new TokenResult
         {
+            IsSucceeded = false,
             Code = code,
             Exception = exception,
-            ErrorMessage = exception.Message,
-            IsSucceded = false
+            ErrorMessage = exception.Message
         };
     }
-
 }
