@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EasyRefreshTokenTest.InMemoryCacheTests
+namespace EasyRefreshTokenTest.InMemoryTests
 {
     public class BadLimitPerProperty2
     {

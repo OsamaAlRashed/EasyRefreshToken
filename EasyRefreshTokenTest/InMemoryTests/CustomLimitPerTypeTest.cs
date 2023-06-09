@@ -6,10 +6,10 @@ using Xunit;
 using EasyRefreshToken;
 using EasyRefreshTokenTest.EFCoreTests.Mocks;
 using EasyRefreshTokenTest.Mocks;
-using EasyRefreshTokenTest.InMemoryCacheTests.Mocks;
+using EasyRefreshTokenTest.InMemoryTests.Mocks;
 using System.Linq;
 
-namespace EasyRefreshTokenTest.InMemoryCacheTests
+namespace EasyRefreshTokenTest.InMemoryTests
 {
     public class CustomLimitPerTypeTest
     {

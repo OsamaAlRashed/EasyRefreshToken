@@ -1,7 +1,7 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using System;
 
-namespace EasyRefreshToken.InMemoryCache
+namespace EasyRefreshToken.InMemory
 {
     /// <summary>
     /// Options to control the behavior of the in-memory token service.

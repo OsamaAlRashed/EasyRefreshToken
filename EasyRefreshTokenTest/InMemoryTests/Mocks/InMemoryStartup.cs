@@ -1,11 +1,11 @@
-﻿using EasyRefreshToken.InMemoryCache;
+﻿using EasyRefreshToken.InMemory;
 using EasyRefreshTokenTest.Mocks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace EasyRefreshTokenTest.InMemoryCacheTests.Mocks;
+namespace EasyRefreshTokenTest.InMemoryTests.Mocks;
 
 public class InMemoryStartup
 {
@@ -18,7 +18,7 @@ public class InMemoryStartup
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-        services.AddInMemoryCacheRefreshToken(options);
+        services.AddInMemoryRefreshToken(options);
 
         return services;
     }

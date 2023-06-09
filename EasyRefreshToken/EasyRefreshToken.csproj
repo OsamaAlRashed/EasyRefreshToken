@@ -13,10 +13,6 @@
    </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
 	<None Update="Refresh_Package.png">
 		<Pack>True</Pack>
 		<PackagePath>\</PackagePath>

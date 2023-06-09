@@ -1,35 +1,37 @@
-﻿using EasyRefreshToken;
+﻿using EasyRefreshToken.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using EasyRefreshToken;
 using EasyRefreshToken.Abstractions;
-using EasyRefreshTokenTest.EFCoreTests.Mocks;
 using EasyRefreshTokenTest.Mocks;
-using EasyRefreshTokenTest.InMemoryCacheTests.Mocks;
+using EasyRefreshTokenTest.InMemoryTests.Mocks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
-namespace EasyRefreshTokenTest.InMemoryCacheTests
+namespace EasyRefreshTokenTest.InMemoryTests
 {
-    public class LimitPerProperty
+    public class BadCustomLimitPerTypeTest
     {
         private readonly ITokenService<Guid> _tokenService;
         private readonly AppDbContext _context;
 
-        public LimitPerProperty()
+        public BadCustomLimitPerTypeTest()
         {
             var provider = InMemoryStartup.ConfigureService(op =>
             {
+                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure((typeof(SubUser1), 2), (typeof(SubUser1), 1), (typeof(SubUser2), 2));
                 op.GetUserById = (serviceProvider, id) =>
                 {
                     return serviceProvider.GetRequiredService<AppDbContext>()
                         .Set<User>().Where(x => x.Id == id)
                         .FirstOrDefault();
                 };
-                op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure("UserType", (UserType.Employee, 1), (UserType.Admin, 2));
             }).BuildServiceProvider();
-            _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
+            var x = provider.GetRequiredService<ITokenRepository<User, Guid>>();
             _context = provider.GetRequiredService<AppDbContext>();
+            _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
         }
 
         [Fact]
@@ -50,10 +52,10 @@ namespace EasyRefreshTokenTest.InMemoryCacheTests
         }
 
         [Fact]
-        public async Task OnLoginEmployee_Limit()
+        public async Task OnLoginSubUser1_Limit()
         {
             Utils util = new Utils(_context);
-            var user = await util.GenerateEmployee();
+            var user = await util.GenerateUserSubUser1();
 
             var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
 
@@ -63,10 +65,10 @@ namespace EasyRefreshTokenTest.InMemoryCacheTests
         }
 
         [Fact]
-        public async Task OnLoginAdmin_Limit()
+        public async Task OnLoginSubUser2_Limit()
         {
             Utils util = new Utils(_context);
-            var user = await util.GenerateAdmin();
+            var user = await util.GenerateUserSubUser2();
 
             var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
             var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
@@ -78,10 +80,29 @@ namespace EasyRefreshTokenTest.InMemoryCacheTests
         }
 
         [Fact]
-        public async Task OnLoginEmpoyee_OverLimit()
+        public async Task OnLoginUser_OverLimit()
         {
             Utils util = new Utils(_context);
-            var user = await util.GenerateEmployee();
+            var user = await util.GenerateUser();
+
+            var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
+            var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
+            var tokenResult3 = await _tokenService.OnLoginAsync(user.Id); //3
+            var tokenResult4 = await _tokenService.OnLoginAsync(user.Id); //4
+
+            var finalResult = tokenResult1.IsSucceeded
+                && tokenResult2.IsSucceeded
+                && tokenResult3.IsSucceeded
+                && tokenResult4.IsSucceeded;
+
+            Assert.True(finalResult);
+        }
+
+        [Fact]
+        public async Task OnLoginSubUser1_OverLimit()
+        {
+            Utils util = new Utils(_context);
+            var user = await util.GenerateUserSubUser1();
 
             var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
             var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
@@ -91,10 +112,10 @@ namespace EasyRefreshTokenTest.InMemoryCacheTests
         }
 
         [Fact]
-        public async Task OnLoginAdmin_OverLimit()
+        public async Task OnLoginSubUser2_OverLimit()
         {
             Utils util = new Utils(_context);
-            var user = await util.GenerateAdmin();
+            var user = await util.GenerateUserSubUser2();
 
             var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
             var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2

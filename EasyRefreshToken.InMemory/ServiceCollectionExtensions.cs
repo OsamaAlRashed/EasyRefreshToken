@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace EasyRefreshToken.InMemoryCache
+namespace EasyRefreshToken.InMemory
 {
     /// <summary>
     /// Extension methods to add and configure the refresh token service.
@@ -10,7 +10,7 @@ namespace EasyRefreshToken.InMemoryCache
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds and configures the in-memory cache refresh token service.
+        /// Adds and configures the in-memory refresh token service.
         /// </summary>
         /// <typeparam name="TUser">The type representing a user.</typeparam>
         /// <typeparam name="TKey">The type representing the key of the user entity.</typeparam>
@@ -18,7 +18,7 @@ namespace EasyRefreshToken.InMemoryCache
         /// <param name="options">The configuration options for the in-memory token service.</param>
         /// <param name="lifetime">The lifetime of the registered services.</param>
         /// <returns>The updated service collection.</returns>
-        public static IServiceCollection AddInMemoryCacheRefreshToken<TUser, TKey>(
+        public static IServiceCollection AddInMemoryRefreshToken<TUser, TKey>(
             this IServiceCollection services,
             Action<InMemoryTokenOptions<TUser, TKey>> options = null,
             ServiceLifetime lifetime = ServiceLifetime.Scoped)

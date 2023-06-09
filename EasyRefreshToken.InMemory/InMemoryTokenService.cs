@@ -3,7 +3,7 @@ using EasyRefreshToken.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
 
-namespace EasyRefreshToken.InMemoryCache
+namespace EasyRefreshToken.InMemory
 {
     internal class InMemoryTokenService<TUser, TKey> : BaseTokenService<TUser, TKey>
         where TUser : class, IUser<TKey>
