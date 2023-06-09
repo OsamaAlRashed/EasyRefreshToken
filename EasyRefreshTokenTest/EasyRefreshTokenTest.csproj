@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -25,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EasyRefreshToken\EasyRefreshToken.csproj" />
+    <ProjectReference Include="..\EasyRefreshToken.EFCore\EasyRefreshToken.EFCore.csproj" />
+    <ProjectReference Include="..\EasyRefreshToken.InMemory\EasyRefreshToken.InMemory.csproj" />
   </ItemGroup>
 
 </Project>

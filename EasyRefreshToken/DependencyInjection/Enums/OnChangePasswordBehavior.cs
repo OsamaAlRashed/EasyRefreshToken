@@ -1,16 +1,17 @@
-﻿namespace EasyRefreshToken.DependencyInjection.Enums
+﻿namespace EasyRefreshToken
 {
     /// <summary>
-    /// OnChangePassword method behaviors
+    /// Defines the behaviors for the OnChangePasswordAsync method.
     /// </summary>
     public enum OnChangePasswordBehavior
     {
         /// <summary>
-        /// Delete all tokens, login is required after this option
+        /// Deletes all tokens. Login is required after using this option.
         /// </summary>
         DeleteAllTokens,
+
         /// <summary>
-        /// Delete all tokens for user and return new token
+        /// Deletes all tokens for the user and generates a new token.
         /// </summary>
         DeleteAllTokensAndAddNewToken
     }
