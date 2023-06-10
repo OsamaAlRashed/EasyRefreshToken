@@ -11,7 +11,7 @@ It offers a flexible and customizable solution for managing refresh tokens, toke
 
 With EasyRefreshToken, you can integrate refresh token functionality into your ASP.NET Core applications without the need to write complex code or manage token-related logic manually. It simplifies the process of refreshing access tokens and ensures a secure and seamless user experience.
 
-It support .Net5, .Net6, and .Net7
+EasyRefreshToken supports .Net5, .Net6, and .Net7
 ## Features
 
 - Automatic management of refresh tokens and token expiration.
