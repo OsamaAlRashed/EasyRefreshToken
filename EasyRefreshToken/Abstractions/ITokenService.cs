@@ -27,8 +27,9 @@ namespace EasyRefreshToken
         /// </summary>
         /// <param name="userId">The specified user's identifier.</param>
         /// <param name="oldToken">The expired refresh token.</param>
+        /// <param name="renewTheToken">Keep the same token with new life</param>
         /// <returns>A <see cref="TokenResult"/> object containing the result of the operation.</returns>
-        Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken);
+        Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken, bool renewTheToken = false);
 
         /// <summary>
         /// This method should be called when changing the user's password.
@@ -63,21 +64,21 @@ namespace EasyRefreshToken
         /// <returns>A Boolean value indicating whether the operation succeeded.</returns>
         Task<bool> ClearExpiredAsync(TKey userId);
 
-        ///// <summary>
-        ///// Blocks a user, adding them to a blacklist and preventing them from obtaining a new token.
-        ///// Please note that the blacklist is an in-memory list.
-        ///// </summary>
-        ///// <param name="userId">The user's identifier.</param>
-        ///// <returns>A Boolean value indicating whether the operation succeeded.</returns>
-        //Task<bool> BlockAsync(TKey userId);
+        /// <summary>
+        /// Blocks a user, adding them to a blacklist and preventing them from obtaining a new token.
+        /// Please note that the blacklist is an in-memory list.
+        /// </summary>
+        /// <param name="userId">The user's identifier.</param>
+        /// <returns>A Boolean value indicating whether the operation succeeded.</returns>
+        Task<bool> BlockAsync(TKey userId);
 
-        ///// <summary>
-        ///// Unblocks a user, removing them from the blacklist and allowing them to obtain a new token.
-        ///// Please note that the blacklist is an in-memory list.
-        ///// </summary>
-        ///// <param name="userId">The user's identifier.</param>
-        ///// <returns>A Boolean value indicating whether the operation succeeded.</returns>
-        //Task<bool> UnblockAsync(TKey userId);
+        /// <summary>
+        /// Unblocks a user, removing them from the blacklist and allowing them to obtain a new token.
+        /// Please note that the blacklist is an in-memory list.
+        /// </summary>
+        /// <param name="userId">The user's identifier.</param>
+        /// <returns>A Boolean value indicating whether the operation succeeded.</returns>
+        Task<bool> UnblockAsync(TKey userId);
     }
 
 }

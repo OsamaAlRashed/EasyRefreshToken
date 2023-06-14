@@ -3,6 +3,7 @@ using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken.DependencyInjection.Enums;
 using EasyRefreshToken.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace EasyRefreshToken
     {
         private readonly RefreshTokenOptions _options;
         private readonly HashSet<TKey> _blackList = new();
+        private readonly object _lock = new object();
         private readonly ITokenRepository<TUser, TKey> _tokenRepository;
 
         /// <inheritdoc/>
@@ -44,7 +46,7 @@ namespace EasyRefreshToken
         public virtual async Task<bool> OnLogoutAsync(string token) => await _tokenRepository.Delete(token);
 
         /// <inheritdoc/>
-        public virtual async Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken)
+        public virtual async Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken, bool renewTheToken)
         {
             var isValidToken = await _tokenRepository.IsValidToken(userId, oldToken);
 
@@ -53,7 +55,7 @@ namespace EasyRefreshToken
                 await _tokenRepository.Delete(oldToken);
                 return TokenResult.SetSuccess(
                     await _tokenRepository.Add(userId,
-                              _options.TokenGenerationMethod(),
+                              renewTheToken ? oldToken : _options.TokenGenerationMethod(),
                               GetExpiredDate()));
             }
 
@@ -74,6 +76,12 @@ namespace EasyRefreshToken
         /// <inheritdoc/>
         public virtual async Task<TokenResult> OnLoginAsync(TKey userId)
         {
+            lock (_lock)
+            {
+                if (_blackList.Contains(userId))
+                    return TokenResult.SetFailed($"User with id {userId} is blocked.", 401);
+            }
+
             TUser user = await _tokenRepository.GetById(userId);
             if (user is null && _options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
             {
@@ -95,6 +103,33 @@ namespace EasyRefreshToken
                     _options.TokenGenerationMethod(),
                     GetExpiredDate()));
         }
+
+        /// <inheritdoc/>
+        public async Task<bool> BlockAsync(TKey userId)
+        {
+            lock (_lock)
+            {
+                if (_blackList.Contains(userId))
+                    return false;
+
+                _blackList.Add(userId);
+                return true;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> UnblockAsync(TKey userId)
+        {
+            lock (_lock)
+            {
+                if (!_blackList.Contains(userId))
+                    return false;
+
+                _blackList.Add(userId);
+                return true;
+            }
+        }
+
         #endregion
 
         #region Private
@@ -135,7 +170,6 @@ namespace EasyRefreshToken
 
         private DateTime? GetExpiredDate()
             => _options.TokenExpiredDays.HasValue ? DateTime.UtcNow.AddDays(_options.TokenExpiredDays.Value) : null;
-
         #endregion
     }
 }
