@@ -4,12 +4,13 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using EasyRefreshToken;
-using EasyRefreshTokenTest.EFCoreTests.Mocks;
-using EasyRefreshTokenTest.Mocks;
-using EasyRefreshTokenTest.InMemoryTests.Mocks;
+using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using System.Linq;
+using EasyRefreshToken.Exceptions;
 
-namespace EasyRefreshTokenTest.InMemoryTests
+namespace EasyRefreshToken.Tests.InMemoryTests
 {
     public class BadLimitPerProperty1
     {
@@ -39,7 +40,7 @@ namespace EasyRefreshTokenTest.InMemoryTests
             Utils util = new Utils(_context);
             var user = await util.GenerateUser();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async ()
+            await Assert.ThrowsAsync<PropertyNameNotExistException>(async ()
                 => await _tokenService.OnLoginAsync(user.Id));
         }
     }

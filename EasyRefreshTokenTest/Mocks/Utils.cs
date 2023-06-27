@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace EasyRefreshTokenTest.Mocks;
+namespace EasyRefreshToken.Tests.Mocks;
 
 public class Utils
 {

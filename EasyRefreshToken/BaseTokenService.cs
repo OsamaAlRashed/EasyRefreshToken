@@ -1,9 +1,8 @@
 ﻿using EasyRefreshToken.Abstractions;
+using EasyRefreshToken.Commons;
 using EasyRefreshToken.DependencyInjection;
-using EasyRefreshToken.DependencyInjection.Enums;
-using EasyRefreshToken.Utils;
+using EasyRefreshToken.Enums;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,44 +30,45 @@ namespace EasyRefreshToken
         #region Service
 
         /// <inheritdoc/>
-        public virtual async Task<bool> ClearAsync() => await _tokenRepository.Delete();
+        public virtual async Task<bool> ClearAsync() => await _tokenRepository.DeleteAsync();
 
         /// <inheritdoc/>
-        public virtual async Task<bool> ClearAsync(TKey userId) => await _tokenRepository.Delete(userId);
+        public virtual async Task<bool> ClearAsync(TKey userId) => await _tokenRepository.DeleteAsync(userId);
 
         /// <inheritdoc/>
-        public virtual async Task<bool> ClearExpiredAsync() => await _tokenRepository.DeleteExpired();
+        public virtual async Task<bool> ClearExpiredAsync() => await _tokenRepository.DeleteExpiredAsync();
 
         /// <inheritdoc/>
-        public virtual async Task<bool> ClearExpiredAsync(TKey userId) => await _tokenRepository.DeleteExpired(userId);
+        public virtual async Task<bool> ClearExpiredAsync(TKey userId) => await _tokenRepository.DeleteExpiredAsync(userId);
 
         /// <inheritdoc/>
-        public virtual async Task<bool> OnLogoutAsync(string token) => await _tokenRepository.Delete(token);
+        public virtual async Task<bool> OnLogoutAsync(string token) => await _tokenRepository.DeleteAsync(token);
 
         /// <inheritdoc/>
         public virtual async Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken, bool renewTheToken)
         {
-            var isValidToken = await _tokenRepository.IsValidToken(userId, oldToken);
+            var isValidToken = await _tokenRepository.IsValidTokenAsync(userId, oldToken);
 
-            if (isValidToken)
-            {
-                await _tokenRepository.Delete(oldToken);
-                return TokenResult.SetSuccess(
-                    await _tokenRepository.Add(userId,
-                              renewTheToken ? oldToken : _options.TokenGenerationMethod(),
-                              GetExpiredDate()));
-            }
+            if (!isValidToken)
+                return TokenResult.SetFailed($"{oldToken} not valid", 400);
 
-            return TokenResult.SetFailed($"{oldToken} not found", 404);
+            await _tokenRepository.DeleteAsync(oldToken);
+
+            var token = await _tokenRepository.AddAsync(
+                userId,
+                renewTheToken ? oldToken : _options.TokenGenerationMethod(),
+                GetExpiredDate());
+
+            return TokenResult.SetSuccess(token);
         }
 
         /// <inheritdoc/>
         public virtual async Task<string> OnChangePasswordAsync(TKey userId)
         {
-            await _tokenRepository.Delete(userId);
+            await _tokenRepository.DeleteAsync(userId);
 
             if (_options.OnChangePasswordBehavior == OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken)
-                return await _tokenRepository.Add(userId, _options.TokenGenerationMethod(), GetExpiredDate());
+                return await _tokenRepository.AddAsync(userId, _options.TokenGenerationMethod(), GetExpiredDate());
 
             return null;
         }
@@ -82,23 +82,29 @@ namespace EasyRefreshToken
                     return TokenResult.SetFailed($"User with id {userId} is blocked.", 401);
             }
 
-            TUser user = await _tokenRepository.GetById(userId);
+            TUser user = await _tokenRepository.GetByIdAsync(userId);
+
             if (user is null && _options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
-            {
                 return TokenResult.SetFailed($"User with id {userId} not found.", 404);
+
+            int maxNumberOfActiveDevicesPerUser = _options.MaxNumberOfActiveDevices.GlobalLimit;
+
+            if (_options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
+            {
+                maxNumberOfActiveDevicesPerUser = GetMaxNumberOfActiveDevicesPerUser(user);
             }
 
-            if (await IsAccessToLimit(user, userId))
+            if (await _tokenRepository.GetNumberOfActiveTokensAsync(userId) >= maxNumberOfActiveDevicesPerUser)
             {
-                var oldedToken = await _tokenRepository.GetOldestToken(userId);
+                var oldedToken = await _tokenRepository.GetOldestTokenAsync(userId);
                 if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
                     return TokenResult.SetFailed("Login not allowed because access to max number of active devices.", 401);
 
-                await _tokenRepository.Delete(oldedToken);
+                await _tokenRepository.DeleteAsync(oldedToken);
             }
 
             return TokenResult.SetSuccess(
-                await _tokenRepository.Add(
+                await _tokenRepository.AddAsync(
                     userId,
                     _options.TokenGenerationMethod(),
                     GetExpiredDate()));
@@ -125,7 +131,7 @@ namespace EasyRefreshToken
                 if (!_blackList.Contains(userId))
                     return false;
 
-                _blackList.Add(userId);
+                _blackList.Remove(userId);
                 return true;
             }
         }
@@ -133,35 +139,19 @@ namespace EasyRefreshToken
         #endregion
 
         #region Private
-        private async Task<bool> IsAccessToLimit(TUser user, TKey userId)
-        {
-            var limit = GetMaxNumberOfActiveDevicesPerUser(user);
-            return await _tokenRepository.GetNumberActiveTokens(userId) >= limit;
-        }
-
         private int GetMaxNumberOfActiveDevicesPerUser(TUser user)
         {
-            if(user is null)
+            if(_options.MaxNumberOfActiveDevices.Type == MaxNumberOfActiveDevicesType.LimitPerType &&
+                _options.MaxNumberOfActiveDevices.LimitPerType.ContainsKey(user.GetType()))
             {
-                return _options.MaxNumberOfActiveDevices.GlobalLimit;
+                return _options.MaxNumberOfActiveDevices.LimitPerType[user.GetType()];
             }
 
-            switch (_options.MaxNumberOfActiveDevices.Type)
+            if(_options.MaxNumberOfActiveDevices.Type == MaxNumberOfActiveDevicesType.LimitPerProperty)
             {
-                case MaxNumberOfActiveDevicesType.GlobalLimit:
-                    return _options.MaxNumberOfActiveDevices.GlobalLimit;
-
-                case MaxNumberOfActiveDevicesType.LimitPerType:
-                    if (_options.MaxNumberOfActiveDevices.LimitPerType.TryGetValue(user.GetType(), out int value))
-                        return value;
-                    break;
-
-                case MaxNumberOfActiveDevicesType.LimitPerProperty:
-                    var propName = _options.MaxNumberOfActiveDevices.LimitPerProperty.Item1;
-                    var propValue = Helpers.GetPropertyValue(user, propName);
-                    if (propValue == null || !_options.MaxNumberOfActiveDevices.LimitPerProperty.Item2.ContainsKey(propValue))
-                        return _options.MaxNumberOfActiveDevices.GlobalLimit;
-
+                var propertyName = _options.MaxNumberOfActiveDevices.LimitPerProperty.PropertyName;
+                var propValue = Helpers.GetPropertyValue(user, propertyName);
+                if (propValue is not null && _options.MaxNumberOfActiveDevices.LimitPerProperty.ValuePerLimit.ContainsKey(propValue))
                     return _options.MaxNumberOfActiveDevices.LimitPerProperty.Item2[propValue];
             }
 

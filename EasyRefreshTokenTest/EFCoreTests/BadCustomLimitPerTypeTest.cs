@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Xunit;
 using EasyRefreshToken;
 using EasyRefreshToken.Abstractions;
-using EasyRefreshTokenTest.EFCoreTests.Mocks;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 
-namespace EasyRefreshTokenTest.EFCoreTests
+namespace EasyRefreshToken.Tests.EFCoreTests
 {
     public class BadCustomLimitPerTypeTest
     {

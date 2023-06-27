@@ -1,10 +1,10 @@
 ﻿using EasyRefreshToken.DependencyInjection;
 using EasyRefreshToken;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace EasyRefreshTokenTest.CustomServiceTests.Mocks
+namespace EasyRefreshToken.Tests.CustomServiceTests.Mocks
 {
     public class CustomServiceStartup
     {

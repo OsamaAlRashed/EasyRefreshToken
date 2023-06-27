@@ -4,12 +4,12 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using EasyRefreshToken.Abstractions;
-using EasyRefreshTokenTest.EFCoreTests.Mocks;
-using EasyRefreshTokenTest.Mocks;
-using EasyRefreshTokenTest.InMemoryTests.Mocks;
+using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using System.Linq;
 
-namespace EasyRefreshTokenTest.InMemoryTests
+namespace EasyRefreshToken.Tests.InMemoryTests
 {
     public class LimitPerProperty
     {

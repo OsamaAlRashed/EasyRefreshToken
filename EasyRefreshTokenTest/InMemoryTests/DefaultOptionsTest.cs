@@ -1,7 +1,7 @@
 ﻿using EasyRefreshToken;
-using EasyRefreshTokenTest.EFCoreTests.Mocks;
-using EasyRefreshTokenTest.InMemoryTests.Mocks;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+using EasyRefreshToken.Tests.InMemoryTests.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EasyRefreshTokenTest.InMemoryTests
+namespace EasyRefreshToken.Tests.InMemoryTests
 {
     public class DefaultOptionsTest
     {

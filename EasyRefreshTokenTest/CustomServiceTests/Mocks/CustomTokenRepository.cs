@@ -1,69 +1,100 @@
 ﻿using EasyRefreshToken.Abstractions;
 using EasyRefreshToken.DependencyInjection;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace EasyRefreshTokenTest.CustomServiceTests.Mocks
+namespace EasyRefreshToken.Tests.CustomServiceTests.Mocks
 {
+    internal record InMemoryRefreshTokenModel(string Token, DateTime? ExpiredDate);
+
     public class CustomTokenRepository : ITokenRepository<User, Guid>
     {
         private readonly RefreshTokenOptions _options;
+        private ConcurrentDictionary<Guid, List<InMemoryRefreshTokenModel>> _refreshTokens = new();
 
         public CustomTokenRepository(IOptions<RefreshTokenOptions> options)
         {
             _options = options?.Value ?? new RefreshTokenOptions();
         }
 
-        public async Task<string> Add(Guid userId, string token, DateTime? expiredDate)
+        public async Task<string> AddAsync(Guid userId, string token, DateTime? expiredDate)
         {
-            throw new NotImplementedException();
+            if (!_refreshTokens.TryGetValue(userId, out List<InMemoryRefreshTokenModel> values) || values == null)
+            {
+                values = new List<InMemoryRefreshTokenModel>();
+            }
+
+            values.Add(new InMemoryRefreshTokenModel(token, expiredDate));
+
+            _refreshTokens[userId] = values;
+
+            return token;
         }
 
-        public async Task<bool> Delete()
+        public async Task<bool> DeleteAsync()
         {
-            throw new NotImplementedException();
+            _refreshTokens.Clear();
+            return true;
         }
 
-        public async Task<bool> Delete(Guid userId)
+        public async Task<bool> DeleteAsync(Guid userId)
+            => _refreshTokens.TryRemove(userId, out _);
+
+        public async Task<bool> DeleteAsync(string token)
         {
-            throw new NotImplementedException();
+            foreach (var user in _refreshTokens)
+            {
+                if (user.Value.Any(x => x.Token == token))
+                {
+                    _refreshTokens[user.Key] = user.Value.Where(x => x.Token != token).ToList();
+                }
+            }
+
+            return true;
         }
 
-        public async Task<bool> Delete(string token)
+        public async Task<bool> DeleteExpiredAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            var values = Get(userId).Where(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow).ToList();
+
+            _refreshTokens[userId] = values;
+            return true;
         }
 
-        public async Task<bool> DeleteExpired(Guid userId)
+        public async Task<bool> DeleteExpiredAsync()
         {
-            throw new NotImplementedException();
+            foreach (var user in _refreshTokens)
+            {
+                await DeleteExpiredAsync(user.Key);
+            }
+
+            return true;
         }
 
-        public async Task<bool> DeleteExpired()
+        public async Task<User> GetByIdAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
-        public async Task<User> GetById(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<int> GetNumberOfActiveTokensAsync(Guid userId)
+            => Get(userId).Where(x => (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow))
+              .Count();
 
-        public async Task<int> GetNumberActiveTokens(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<string?> GetOldestTokenAsync(Guid userId)
+            => Get(userId).Where(x => x.ExpiredDate.HasValue)
+                .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefault();
 
-        public async Task<string> GetOldestToken(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<bool> IsValidTokenAsync(Guid userId, string token) 
+            => Get(userId).Any(x => x.Token == token &&
+            (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate));
 
-        public async Task<bool> IsValidToken(Guid userId, string token)
-        {
-            throw new NotImplementedException();
-        }
+        private List<InMemoryRefreshTokenModel> Get(Guid userId)
+            => _refreshTokens.GetValueOrDefault(userId) ?? new List<InMemoryRefreshTokenModel>();
+
     }
 }

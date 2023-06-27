@@ -4,10 +4,10 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using EasyRefreshToken;
-using EasyRefreshTokenTest.EFCoreTests.Mocks;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 
-namespace EasyRefreshTokenTest.EFCoreTests
+namespace EasyRefreshToken.Tests.EFCoreTests
 {
     public class CustomLimitPerTypeTest
     {

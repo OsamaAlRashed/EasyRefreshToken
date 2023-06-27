@@ -1,17 +1,18 @@
 ﻿using EasyRefreshToken;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Exceptions;
+using EasyRefreshToken.Tests.Mocks;
 using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EasyRefreshTokenTest.EFCoreTests
+namespace EasyRefreshToken.Tests.EFCoreTests
 {
     public class BadLimitPerProperty2
     {
         [Fact]
         public async Task Setup_OutOfRangeException()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.Throws<LimitOutOfRangeException>(() =>
                 MaxNumberOfActiveDevices.Configure("asdsad", (UserType.Employee, -1), (UserType.Admin, 2)));
         }
 
@@ -19,14 +20,14 @@ namespace EasyRefreshTokenTest.EFCoreTests
 
         public async Task Setup_ArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<PropertyNameNullException>(() =>
                 MaxNumberOfActiveDevices.Configure(null, (UserType.Employee, 1), (UserType.Admin, 2)));
         }
 
         [Fact]
         public async Task Setup_Exception()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<PropertyNameNullException>(() =>
                 MaxNumberOfActiveDevices.Configure(null, (null, 1), (UserType.Admin, 2)));
         }
     }
