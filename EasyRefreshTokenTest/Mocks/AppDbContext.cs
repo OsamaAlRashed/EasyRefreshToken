@@ -1,10 +1,10 @@
-﻿using EasyRefreshTokenTest.EFCoreTests.Mocks;
+﻿using EasyRefreshToken.Tests.EFCoreTests.Mocks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace EasyRefreshTokenTest.Mocks;
+namespace EasyRefreshToken.Tests.Mocks;
 
 public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {

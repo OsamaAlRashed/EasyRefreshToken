@@ -1,5 +1,4 @@
-﻿using EasyRefreshToken.Enums;
-using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+﻿using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using EasyRefreshToken.Tests.Mocks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,32 +7,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EasyRefreshToken.Tests.EFCoreTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
-public class CustomOption1Test
+public class DefaultOptionsTest
 {
     private readonly ITokenService<Guid> _tokenService;
     private readonly AppDbContext _context;
 
-    public CustomOption1Test()
+    public DefaultOptionsTest()
     {
-        var provider = EFStartup.ConfigureService(op =>
-        {
-            op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure(3);
-            op.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
-            op.TokenExpiredDays = null;
-            op.TokenGenerationMethod = () =>
-            {
-                string s = "";
-                Random random = new Random();
-                for (int i = 0; i < 6; i++)
-                {
-                    s += random.Next().ToString();
-                }
-                return s;
-            };
-            op.OnChangePasswordBehavior = OnChangePasswordBehavior.DeleteAllTokensAndAddNewToken;
-        }).BuildServiceProvider();
+        var provider = InMemoryStartup.ConfigureService().BuildServiceProvider();
         _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
         _context = provider.GetRequiredService<AppDbContext>();
     }
@@ -50,7 +33,6 @@ public class CustomOption1Test
         Assert.True(tokenResult.IsSucceeded);
     }
 
-
     [Fact]
     public async Task OnLogin_LimitOK()
     {
@@ -60,31 +42,20 @@ public class CustomOption1Test
         var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
         var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
         var tokenResult3 = await _tokenService.OnLoginAsync(user.Id); //3
-
-        var finalResult = tokenResult1.IsSucceeded
-            && tokenResult2.IsSucceeded
-            && tokenResult3.IsSucceeded;
-
-        Assert.True(finalResult);
-    }
-
-    [Fact]
-    public async Task OnLogin_OverLimit()
-    {
-        Utils util = new Utils(_context);
-        var user = await util.GenerateUser();
-
-        var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
-        var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
-        var tokenResult3 = await _tokenService.OnLoginAsync(user.Id); //3
         var tokenResult4 = await _tokenService.OnLoginAsync(user.Id); //4
+        var tokenResult5 = await _tokenService.OnLoginAsync(user.Id); //5
+        var tokenResult6 = await _tokenService.OnLoginAsync(user.Id); //6
+        var tokenResult7 = await _tokenService.OnLoginAsync(user.Id); //7
 
         var finalResult = tokenResult1.IsSucceeded
             && tokenResult2.IsSucceeded
-            && tokenResult3.IsSucceeded;
+            && tokenResult3.IsSucceeded
+            && tokenResult4.IsSucceeded
+            && tokenResult5.IsSucceeded
+            && tokenResult6.IsSucceeded
+            && tokenResult7.IsSucceeded;
 
         Assert.True(finalResult);
-        Assert.False(tokenResult4.IsSucceeded);
     }
 
     [Fact]
@@ -167,7 +138,7 @@ public class CustomOption1Test
 
         var result = await _tokenService.OnChangePasswordAsync(user.Id);
 
-        Assert.NotEqual("", result);
+        Assert.Equal(null, result);
     }
 
     [Fact]
@@ -184,5 +155,4 @@ public class CustomOption1Test
 
         Assert.False(tokenResult2.IsSucceeded);
     }
-
 }

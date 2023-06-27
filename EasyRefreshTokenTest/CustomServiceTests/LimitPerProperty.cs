@@ -2,33 +2,31 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
-using EasyRefreshToken.Abstractions;
 using EasyRefreshToken.Tests.Mocks;
 using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using System.Linq;
 
-namespace EasyRefreshToken.Tests.InMemoryTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
-public class BadCustomLimitPerTypeTest
+public class LimitPerProperty
 {
     private readonly ITokenService<Guid> _tokenService;
     private readonly AppDbContext _context;
 
-    public BadCustomLimitPerTypeTest()
+    public LimitPerProperty()
     {
         var provider = InMemoryStartup.ConfigureService(op =>
         {
-            op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure((typeof(SubUser1), 2), (typeof(SubUser1), 1), (typeof(SubUser2), 2));
             op.GetUserById = (serviceProvider, id) =>
             {
                 return serviceProvider.GetRequiredService<AppDbContext>()
                     .Set<User>().Where(x => x.Id == id)
                     .FirstOrDefault();
             };
+            op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure("UserType", (UserType.Employee, 1), (UserType.Admin, 2));
         }).BuildServiceProvider();
-        var x = provider.GetRequiredService<ITokenRepository<User, Guid>>();
-        _context = provider.GetRequiredService<AppDbContext>();
         _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
+        _context = provider.GetRequiredService<AppDbContext>();
     }
 
     [Fact]
@@ -49,10 +47,10 @@ public class BadCustomLimitPerTypeTest
     }
 
     [Fact]
-    public async Task OnLoginSubUser1_Limit()
+    public async Task OnLoginEmployee_Limit()
     {
         Utils util = new Utils(_context);
-        var user = await util.GenerateUserSubUser1();
+        var user = await util.GenerateEmployee();
 
         var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
 
@@ -62,10 +60,10 @@ public class BadCustomLimitPerTypeTest
     }
 
     [Fact]
-    public async Task OnLoginSubUser2_Limit()
+    public async Task OnLoginAdmin_Limit()
     {
         Utils util = new Utils(_context);
-        var user = await util.GenerateUserSubUser2();
+        var user = await util.GenerateAdmin();
 
         var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
         var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
@@ -77,29 +75,10 @@ public class BadCustomLimitPerTypeTest
     }
 
     [Fact]
-    public async Task OnLoginUser_OverLimit()
+    public async Task OnLoginEmpoyee_OverLimit()
     {
         Utils util = new Utils(_context);
-        var user = await util.GenerateUser();
-
-        var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
-        var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
-        var tokenResult3 = await _tokenService.OnLoginAsync(user.Id); //3
-        var tokenResult4 = await _tokenService.OnLoginAsync(user.Id); //4
-
-        var finalResult = tokenResult1.IsSucceeded
-            && tokenResult2.IsSucceeded
-            && tokenResult3.IsSucceeded
-            && tokenResult4.IsSucceeded;
-
-        Assert.True(finalResult);
-    }
-
-    [Fact]
-    public async Task OnLoginSubUser1_OverLimit()
-    {
-        Utils util = new Utils(_context);
-        var user = await util.GenerateUserSubUser1();
+        var user = await util.GenerateEmployee();
 
         var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
         var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2
@@ -109,10 +88,10 @@ public class BadCustomLimitPerTypeTest
     }
 
     [Fact]
-    public async Task OnLoginSubUser2_OverLimit()
+    public async Task OnLoginAdmin_OverLimit()
     {
         Utils util = new Utils(_context);
-        var user = await util.GenerateUserSubUser2();
+        var user = await util.GenerateAdmin();
 
         var tokenResult1 = await _tokenService.OnLoginAsync(user.Id); //1
         var tokenResult2 = await _tokenService.OnLoginAsync(user.Id); //2

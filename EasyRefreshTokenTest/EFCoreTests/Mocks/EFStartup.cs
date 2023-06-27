@@ -1,11 +1,11 @@
 ﻿using EasyRefreshToken.EFCore;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace EasyRefreshTokenTest.EFCoreTests.Mocks;
+namespace EasyRefreshToken.Tests.EFCoreTests.Mocks;
 
 public class EFStartup
 {

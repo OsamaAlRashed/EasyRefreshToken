@@ -2,33 +2,30 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
-using EasyRefreshToken.Abstractions;
 using EasyRefreshToken.Tests.Mocks;
 using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using System.Linq;
 
-namespace EasyRefreshToken.Tests.InMemoryTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
-public class BadCustomLimitPerTypeTest
+public class CustomLimitPerTypeTest
 {
     private readonly ITokenService<Guid> _tokenService;
     private readonly AppDbContext _context;
-
-    public BadCustomLimitPerTypeTest()
+    public CustomLimitPerTypeTest()
     {
         var provider = InMemoryStartup.ConfigureService(op =>
         {
-            op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure((typeof(SubUser1), 2), (typeof(SubUser1), 1), (typeof(SubUser2), 2));
             op.GetUserById = (serviceProvider, id) =>
             {
                 return serviceProvider.GetRequiredService<AppDbContext>()
                     .Set<User>().Where(x => x.Id == id)
                     .FirstOrDefault();
             };
+            op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure((typeof(SubUser1), 1), (typeof(SubUser2), 2));
         }).BuildServiceProvider();
-        var x = provider.GetRequiredService<ITokenRepository<User, Guid>>();
-        _context = provider.GetRequiredService<AppDbContext>();
         _tokenService = provider.GetRequiredService<ITokenService<Guid>>();
+        _context = provider.GetRequiredService<AppDbContext>();
     }
 
     [Fact]

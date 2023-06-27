@@ -11,16 +11,17 @@ It offers a flexible and customizable solution for managing refresh tokens, toke
 
 With EasyRefreshToken, you can integrate refresh token functionality into your ASP.NET Core applications without the need to write complex code or manage token-related logic manually. It simplifies the process of refreshing access tokens and ensures a secure and seamless user experience.
 
-It support .Net5, .Net6, and .Net7
 ## Features
 
 - Automatic management of refresh tokens and token expiration.
 - Flexible options for configuring token behavior, such as token expiration duration and preventing simultaneous logins.
-- Determine the number of tokens for each user according to global limit, its type or one of its properties.
-- Support for different storage mechanisms, including in-memory and Entity Framework Core.
+- Determine the number of tokens for each user according to the global limit, its type, or one of its properties.
+- Support for different storage mechanisms, including in-memory and Databases (By Entity Framework Core).
+- Customizable the Repository Implementation.
 - Customizable token generation methods.
 - Integration with ASP.NET Core Identity.
 - Lightweight and minimal dependencies.
+- Support .Net5, .Net6, and .Net7
 
 ## Getting Started
 
@@ -31,16 +32,19 @@ Follow these steps to get started with EasyRefreshToken in your ASP.NET Core app
 Install the EasyRefreshToken package from NuGet by using the following command:
 
 ```sh
-// In-Memory Refrsh Token 
+// In-Memory Refresh Token 
 dotnet add package EasyRefreshToken.InMemory
 
 // EF Core Cache Refresh Token
 dotnet add package EasyRefreshToken.EFCore
+
+// Custom Refresh Token
+dotnet add package EasyRefreshToken
 ```
 
 ### 2. Configuration
 
-In the ConfigureServices method of your Startup.cs / Program.cs file, add the EasyRefreshToken services and configure the options:
+In the ConfigureServices method of your Startup.cs / Program.cs file, add the EasyRefreshToken services, and configure the options:
 
 
 ```cs
@@ -53,7 +57,6 @@ builder.Services.AddInMemoryRefreshToken(options =>
 {
     // Configure the options as needed
     options.TokenExpiredDays = 7;
-    options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
     // ...
 });
 
@@ -66,7 +69,7 @@ builder.Services.AddInMemoryRefreshToken(options =>
 Make your `TUser` inherit from `IUser`:
 
 ```cs
-public class User : IUser { }
+public class User: IUser { }
 ```
 
 Inject the ITokenService into your controller or service where you want to use the token service functionality:
@@ -105,7 +108,7 @@ public async Task<LoginResponse> Login(LoginDto dto)
 **Common Documentation:**
 
 - You should make your `TUser` inherit from `IUser`.
-- Use `IUser<TKey>` if the key of your User not `string` 
+- Use `IUser<TKey>` if the key of your User is not `string` 
 
 - Use `ITokenService<TKey>` that contains:
 
@@ -117,12 +120,14 @@ public async Task<LoginResponse> Login(LoginDto dto)
   - `Task<bool> ClearExpiredAsync()`: Clears expired token entities.
   - `Task<bool> ClearAsync(TKey userId)`: Clears the token entities for the specified user.
   - `Task<bool> ClearExpiredAsync(TKey userId)`: Clears the expired token entities for the specified user.
+  - `Task<bool> BlockAsync(TKey userId)`: Blocks a user, adding them to a blacklist and preventing them from obtaining a new token.
+  - `Task<bool> UnblockAsync(TKey userId)`: Unblocks a user, removing them from the blacklist and allowing them to obtain a new token.
 
 - Configure your service by options:
-  - `int? TokenExpiredDays`:Sets the number of days until the token expires. If set to null, the token will never expire. Default value is 7 days.
-  - `bool PreventingLoginWhenAccessToMaxNumberOfActiveDevices`: Sets a value indicating whether to prevent login operation when the maximum number of active devices is reached. If set to true and there is a valid token, login will be prevented. If set to false, the old token will be removed and a new token will be added. Default value is true.
+  - `int? TokenExpiredDays`:Sets the number of days until the token expires. If set to null, the token will never expire. The default value is 7 days.
+  - `bool PreventingLoginWhenAccessToMaxNumberOfActiveDevices`: Sets a value indicating whether to prevent login operation when the maximum number of active devices is reached. If set to true and there is a valid token, login will be prevented. If set to false, the old token will be removed and a new token will be added. The default value is true.
   - `Func<string> TokenGenerationMethod`: Sets the method used for generating tokens.
-  - `OnChangePasswordBehavior OnChangePasswordBehavior`: Sets the behavior of the OnChangePassword method. Default value is OnChangePasswordBehavior.DeleteAllTokens.
+  - `OnChangePasswordBehavior OnChangePasswordBehavior`: Sets the behavior of the OnChangePassword method. The default value is OnChangePasswordBehavior.DeleteAllTokens.
   - `MaxNumberOfActiveDevices MaxNumberOfActiveDevices`: Sets the maximum number of active devices per user type. If a type is not specified, the default value is `int.MaxValue`
 
 **MaxNumberOfActiveDevices**
@@ -132,9 +137,9 @@ public async Task<LoginResponse> Login(LoginDto dto)
 
 **Notes**
 
-- You can specifies a life time of the Service (the default is Scoped).
+- You can specify a lifetime of the Service (the default is Scoped).
 - For `MaxNumberOfActiveDevices` use `MaxNumberOfActiveDevices.Configure()`.
-- Note: when change on options, I highly recommend cleaning the table by `Clear`
+- Note: when changing options, I highly recommend cleaning the table with `Clear`
 
 **EF Core RefreshToken:**
 - Create your own class `MyRefreshToken` and add to it the properties you want and make it inherit from `RefreshToken<TUser, TKey>`
@@ -164,8 +169,15 @@ or `builder.Services.AddEFCoreRefreshToken<AppDbContext, MyRefreshToken, TUser, 
 
 **Warning!!**: You must set `Func<IServiceProvider, TKey, TUser>? GetUserById` option, if you use `LimitPerProperty` or `LimitPerType`.
 
+**Custom RefreshToken**
+
+- Create your custom repository `TRepository`.
+  
+- In Program Class:
+  `services.AddCustomRefreshToken<TUser, TKey, TRepository>()`;
+
 ### 5. Contributing
-Contributions to EasyRefreshToken are welcome and encouraged! If you find any bugs, issues, or have feature requests, please open a new issue on the GitHub repository. If you would like to contribute code, please fork the repository, make your changes, and submit a pull request.
+Contributions to EasyRefreshToken are welcome and encouraged! If you find any bugs, or issues, or have feature requests, please open a new issue on the GitHub repository. If you would like to contribute code, please fork the repository, make your changes, and submit a pull request.
 
 ### 6. License
 EasyRefreshToken is licensed under the MIT License.

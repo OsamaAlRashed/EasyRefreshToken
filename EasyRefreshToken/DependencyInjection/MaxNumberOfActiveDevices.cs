@@ -1,4 +1,5 @@
-﻿using EasyRefreshToken.DependencyInjection.Enums;
+﻿using EasyRefreshToken.Enums;
+using EasyRefreshToken.Exceptions;
 using System;
 using System.Collections.Generic;
 
@@ -23,15 +24,13 @@ namespace EasyRefreshToken
         public static MaxNumberOfActiveDevices Configure(int limit)
         {
             if (limit <= 0)
-                throw new ArgumentOutOfRangeException(nameof(limit), "The limit must be greater than zero.");
+                throw new LimitOutOfRangeException();
 
-            var result = new MaxNumberOfActiveDevices
+            return new MaxNumberOfActiveDevices
             {
                 Type = MaxNumberOfActiveDevicesType.GlobalLimit,
                 GlobalLimit = limit
             };
-
-            return result;
         }
 
         /// <summary>
@@ -41,7 +40,7 @@ namespace EasyRefreshToken
         /// <returns>A new instance of <see cref="MaxNumberOfActiveDevices"/>.</returns>
         public static MaxNumberOfActiveDevices Configure(params (Type type, int limit)[] pairs)
         {
-            var result = new MaxNumberOfActiveDevices
+            var maxNumberOfActiveDevices = new MaxNumberOfActiveDevices
             {
                 Type = MaxNumberOfActiveDevicesType.LimitPerType,
                 LimitPerType = new Dictionary<Type, int>()
@@ -50,11 +49,12 @@ namespace EasyRefreshToken
             foreach (var (type, limit) in pairs)
             {
                 if (limit <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(limit), "The limit must be greater than zero.");
-                result.LimitPerType[type] = limit;
+                    throw new LimitOutOfRangeException();
+
+                maxNumberOfActiveDevices.LimitPerType[type] = limit;
             }
 
-            return result;
+            return maxNumberOfActiveDevices;
         }
 
         /// <summary>
@@ -66,9 +66,9 @@ namespace EasyRefreshToken
         public static MaxNumberOfActiveDevices Configure(string propertyName, params (object value, int limit)[] pairs)
         {
             if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName), "The property name cannot be null.");
+                throw new PropertyNameNullException();
 
-            var result = new MaxNumberOfActiveDevices
+            var maxNumberOfActiveDevices = new MaxNumberOfActiveDevices
             {
                 Type = MaxNumberOfActiveDevicesType.LimitPerProperty,
                 LimitPerProperty = new ValueTuple<string, Dictionary<object, int>>(propertyName, new())
@@ -77,11 +77,12 @@ namespace EasyRefreshToken
             foreach (var (value, limit) in pairs)
             {
                 if (limit <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(limit), "The limit must be greater than zero.");
-                result.LimitPerProperty.Item2[value] = limit;
+                    throw new LimitOutOfRangeException();
+
+                maxNumberOfActiveDevices.LimitPerProperty.ValuePerLimit[value] = limit;
             }
 
-            return result;
+            return maxNumberOfActiveDevices;
         }
     }
 }

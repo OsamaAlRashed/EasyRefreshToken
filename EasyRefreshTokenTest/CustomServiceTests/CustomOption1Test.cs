@@ -1,5 +1,5 @@
 ﻿using EasyRefreshToken.Enums;
-using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using EasyRefreshToken.Tests.Mocks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EasyRefreshToken.Tests.EFCoreTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
 public class CustomOption1Test
 {
@@ -17,7 +17,7 @@ public class CustomOption1Test
 
     public CustomOption1Test()
     {
-        var provider = EFStartup.ConfigureService(op =>
+        var provider = InMemoryStartup.ConfigureService(op =>
         {
             op.MaxNumberOfActiveDevices = MaxNumberOfActiveDevices.Configure(3);
             op.PreventingLoginWhenAccessToMaxNumberOfActiveDevices = true;
@@ -49,7 +49,6 @@ public class CustomOption1Test
 
         Assert.True(tokenResult.IsSucceeded);
     }
-
 
     [Fact]
     public async Task OnLogin_LimitOK()
