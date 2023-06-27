@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>7.2.0</Version>
+		<Version>7.2.1</Version>
 		<Authors>Osama Al-Rashed</Authors>
 		<Company>None</Company>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
