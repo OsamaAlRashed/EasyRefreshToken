@@ -7,7 +7,7 @@ using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using System.Linq;
 using EasyRefreshToken.Exceptions;
 
-namespace EasyRefreshToken.Tests.InMemoryTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
 public class BadLimitPerProperty1
 {
