@@ -7,7 +7,7 @@ using EasyRefreshToken.Tests.Mocks;
 using EasyRefreshToken.Tests.InMemoryTests.Mocks;
 using System.Linq;
 
-namespace EasyRefreshToken.Tests.InMemoryTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
 public class BadCustomLimitPerTypeTest
 {

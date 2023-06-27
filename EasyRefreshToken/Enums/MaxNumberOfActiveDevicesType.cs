@@ -1,4 +1,4 @@
-﻿namespace EasyRefreshToken.DependencyInjection.Enums
+﻿namespace EasyRefreshToken.Enums
 {
     internal enum MaxNumberOfActiveDevicesType
     {

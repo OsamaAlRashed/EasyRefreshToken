@@ -25,7 +25,7 @@ namespace EasyRefreshToken.InMemory
             _options = options?.Value ?? new InMemoryTokenOptions<TUser, TKey>();
         }
 
-        public async Task<string> Add(TKey userId, string token, DateTime? expiredDate)
+        public async Task<string> AddAsync(TKey userId, string token, DateTime? expiredDate)
         {
             if (userId is null)
                 throw new ArgumentNullException(nameof(userId));
@@ -42,17 +42,17 @@ namespace EasyRefreshToken.InMemory
             return token;
         }
 
-        public async Task<bool> Delete()
+        public async Task<bool> DeleteAsync()
         {
             _refreshTokens.Clear();
 
             return true;
         }
 
-        public async Task<bool> Delete(TKey userId) 
+        public async Task<bool> DeleteAsync(TKey userId) 
             => _refreshTokens.TryRemove(userId, out _);
 
-        public async Task<bool> Delete(string token)
+        public async Task<bool> DeleteAsync(string token)
         {
             foreach (var user in _refreshTokens)
             {
@@ -65,7 +65,7 @@ namespace EasyRefreshToken.InMemory
             return true;
         }
 
-        public async Task<bool> DeleteExpired(TKey userId)
+        public async Task<bool> DeleteExpiredAsync(TKey userId)
         {
             var values = Get(userId).Where(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow).ToList();
 
@@ -74,17 +74,17 @@ namespace EasyRefreshToken.InMemory
             return true;
         }
 
-        public async Task<bool> DeleteExpired()
+        public async Task<bool> DeleteExpiredAsync()
         {
             foreach (var user in _refreshTokens)
             {
-                await DeleteExpired(user.Key);
+                await DeleteExpiredAsync(user.Key);
             }
 
             return true;
         }
 
-        public async Task<TUser?> GetById(TKey userId)
+        public async Task<TUser?> GetByIdAsync(TKey userId)
         {
             if (_options.GetUserById == null)
                 return null;
@@ -92,15 +92,15 @@ namespace EasyRefreshToken.InMemory
             return _options.GetUserById(_serviceProvider, userId);
         }
 
-        public async Task<int> GetNumberActiveTokens(TKey userId)
+        public async Task<int> GetNumberOfActiveTokensAsync(TKey userId)
             => Get(userId).Where(x => (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow))
               .Count();
 
-        public async Task<string?> GetOldestToken(TKey userId)
+        public async Task<string?> GetOldestTokenAsync(TKey userId)
             => Get(userId).Where(x => x.ExpiredDate.HasValue)
                 .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefault();
 
-        public async Task<bool> IsValidToken(TKey userId, string token)
+        public async Task<bool> IsValidTokenAsync(TKey userId, string token)
         {
             return Get(userId).Where(x => x.Token == token &&
                 (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate))

@@ -3,7 +3,7 @@ using EasyRefreshToken.Tests.Mocks;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EasyRefreshToken.Tests.InMemoryTests;
+namespace EasyRefreshToken.Tests.CustomServiceTests;
 
 public class BadLimitPerProperty2
 {

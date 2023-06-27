@@ -1,4 +1,4 @@
-﻿namespace EasyRefreshToken
+﻿namespace EasyRefreshToken.Enums
 {
     /// <summary>
     /// Defines the behaviors for the OnChangePasswordAsync method.

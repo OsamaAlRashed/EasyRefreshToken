@@ -1,4 +1,5 @@
-﻿using EasyRefreshToken.Utils;
+﻿using EasyRefreshToken.Commons;
+using EasyRefreshToken.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 

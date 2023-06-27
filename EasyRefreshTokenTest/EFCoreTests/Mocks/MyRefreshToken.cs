@@ -1,8 +1,8 @@
 ﻿using EasyRefreshToken.EFCore;
-using EasyRefreshTokenTest.Mocks;
+using EasyRefreshToken.Tests.Mocks;
 using System;
 
-namespace EasyRefreshTokenTest.EFCoreTests.Mocks;
+namespace EasyRefreshToken.Tests.EFCoreTests.Mocks;
 
 public class MyRefreshToken : RefreshToken<User, Guid>
 {

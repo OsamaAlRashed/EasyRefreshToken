@@ -5,11 +5,15 @@ VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshToken", "EasyRefreshToken\EasyRefreshToken.csproj", "{525FF2C5-6E3C-4128-8A61-94B9F846B5C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshTokenTest", "EasyRefreshTokenTest\EasyRefreshTokenTest.csproj", "{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshToken.Tests", "EasyRefreshTokenTest\EasyRefreshToken.Tests.csproj", "{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshToken.EFCore", "EasyRefreshToken.EFCore\EasyRefreshToken.EFCore.csproj", "{36D3E2AD-6869-4231-AC2E-F4EF404CF175}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRefreshToken.InMemory", "EasyRefreshToken.InMemory\EasyRefreshToken.InMemory.csproj", "{BEAAC9BC-3121-4559-9C7F-70E588EA1673}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRefreshToken.InMemory", "EasyRefreshToken.InMemory\EasyRefreshToken.InMemory.csproj", "{BEAAC9BC-3121-4559-9C7F-70E588EA1673}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DCCF42E3-ABA8-45FF-98B7-2A2C178A3E28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{287CFDAD-77FB-40EA-908A-535D5AF7A06B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +40,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{525FF2C5-6E3C-4128-8A61-94B9F846B5C8} = {DCCF42E3-ABA8-45FF-98B7-2A2C178A3E28}
+		{B2FCF7D0-D1F0-48F4-AFA3-911AA7954B34} = {287CFDAD-77FB-40EA-908A-535D5AF7A06B}
+		{36D3E2AD-6869-4231-AC2E-F4EF404CF175} = {DCCF42E3-ABA8-45FF-98B7-2A2C178A3E28}
+		{BEAAC9BC-3121-4559-9C7F-70E588EA1673} = {DCCF42E3-ABA8-45FF-98B7-2A2C178A3E28}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {119D1F04-B5AA-43E9-83ED-A8D7E716AFCD}
