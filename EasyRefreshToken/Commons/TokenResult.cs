@@ -36,11 +36,13 @@ namespace EasyRefreshToken
         /// Creates a successful token result with the specified token.
         /// </summary>
         /// <param name="token">The new refresh token.</param>
+        /// <param name="code">The success code (default is 200).</param>
         /// <returns>A new instance of <see cref="TokenResult"/> representing a successful result.</returns>
-        public static TokenResult SetSuccess(string token) => new TokenResult
+        public static TokenResult SetSuccess(string token, int code = 200) => new TokenResult
         {
             IsSucceeded = true,
-            Token = token
+            Token = token,
+            Code = code
         };
 
         /// <summary>
