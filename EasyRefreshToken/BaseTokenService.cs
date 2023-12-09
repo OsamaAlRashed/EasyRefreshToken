@@ -103,11 +103,12 @@ namespace EasyRefreshToken
                 await _tokenRepository.DeleteAsync(oldedToken);
             }
 
-            return TokenResult.SetSuccess(
-                await _tokenRepository.AddAsync(
-                    userId,
-                    _options.TokenGenerationMethod(),
-                    GetExpiredDate()));
+            var newToken = await _tokenRepository.AddAsync(
+                userId,
+                _options.TokenGenerationMethod(),
+                GetExpiredDate());
+
+            return TokenResult.SetSuccess(newToken);
         }
 
         /// <inheritdoc/>
