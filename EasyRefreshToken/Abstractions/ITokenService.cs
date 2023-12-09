@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using EasyRefreshToken.Commons;
 
 namespace EasyRefreshToken
 {
