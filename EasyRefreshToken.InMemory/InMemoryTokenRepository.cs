@@ -128,7 +128,7 @@ namespace EasyRefreshToken.InMemory
         {
             var isValidToken = Get(userId)
                 .Where(x => x.Token == token &&
-                (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate))
+                        DateTime.UtcNow <= x.ExpiredDate)
                     .Any();
 
             return Task.FromResult(isValidToken);

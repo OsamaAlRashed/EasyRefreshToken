@@ -1,4 +1,4 @@
-﻿using EasyRefreshToken.Tests.EFCoreTests.Mocks;
+﻿using EasyRefreshToken.Tests.IntegrationTests.EFCoreTests.Mocks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

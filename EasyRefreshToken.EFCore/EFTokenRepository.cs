@@ -28,8 +28,9 @@ namespace EasyRefreshToken.EFCore
         public async Task<bool> IsValidTokenAsync(TKey key, string token)
         {
             return await _context.Set<TRefreshToken>()
-                .Where(x => x.UserId.Equals(key) && x.Token == token
-                    && (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate))
+                .Where(x => x.UserId.Equals(key) &&
+                            x.Token == token && 
+                            DateTime.UtcNow <= x.ExpiredDate)
                 .AnyAsync();
         }
 

@@ -17,32 +17,61 @@ namespace EasyRefreshToken
         private readonly HashSet<TKey> _blackList = new();
         private readonly object _lock = new object();
         private readonly ITokenRepository<TUser, TKey> _tokenRepository;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         /// <inheritdoc/>
         public BaseTokenService(
             ITokenRepository<TUser, TKey> tokenRepository,
-            RefreshTokenOptions options)
+            RefreshTokenOptions options,
+            IDateTimeProvider dateTimeProvider)
         {
             _options = options ?? new RefreshTokenOptions();
             _tokenRepository = tokenRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         #region Service
 
         /// <inheritdoc/>
-        public virtual async Task<bool> ClearAsync() => await _tokenRepository.DeleteAsync();
+        public virtual async Task<TokenResult> OnLoginAsync(TKey userId)
+        {
+            lock (_lock)
+            {
+                if (_blackList.Contains(userId))
+                {
+                    return TokenResult.SetFailed($"User with id {userId} is blocked.", 401);
+                }
+            }
 
-        /// <inheritdoc/>
-        public virtual async Task<bool> ClearAsync(TKey userId) => await _tokenRepository.DeleteAsync(userId);
+            TUser user = await _tokenRepository.GetByIdAsync(userId);
 
-        /// <inheritdoc/>
-        public virtual async Task<bool> ClearExpiredAsync() => await _tokenRepository.DeleteExpiredAsync();
+            int maxNumberOfActiveDevices = _options.MaxNumberOfActiveDevices.GlobalLimit;
 
-        /// <inheritdoc/>
-        public virtual async Task<bool> ClearExpiredAsync(TKey userId) => await _tokenRepository.DeleteExpiredAsync(userId);
+            if (user is null && 
+                _options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
+                return TokenResult.SetFailed($"User with id {userId} not found.", 404);
 
-        /// <inheritdoc/>
-        public virtual async Task<bool> OnLogoutAsync(string token) => await _tokenRepository.DeleteAsync(token);
+            if (_options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
+            {
+                maxNumberOfActiveDevices = GetMaxNumberOfActiveDevicesPerUser(user);
+            }
+
+            if (await _tokenRepository.GetNumberOfActiveTokensAsync(userId) >= maxNumberOfActiveDevices)
+            {
+                var oldestToken = await _tokenRepository.GetOldestTokenAsync(userId);
+                if (oldestToken == null || _options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices)
+                    return TokenResult.SetFailed("Login not allowed because access to max number of active devices.", 401);
+
+                await _tokenRepository.DeleteAsync(oldestToken);
+            }
+
+            var newToken = await _tokenRepository.AddAsync(
+                userId,
+                _options.TokenGenerationMethod(),
+                GetExpiredDate());
+
+            return TokenResult.SetSuccess(newToken);
+        }
 
         /// <inheritdoc/>
         public virtual async Task<TokenResult> OnAccessTokenExpiredAsync(TKey userId, string oldToken, bool renewTheToken)
@@ -74,69 +103,50 @@ namespace EasyRefreshToken
         }
 
         /// <inheritdoc/>
-        public virtual async Task<TokenResult> OnLoginAsync(TKey userId)
-        {
-            lock (_lock)
-            {
-                if (_blackList.Contains(userId))
-                    return TokenResult.SetFailed($"User with id {userId} is blocked.", 401);
-            }
-
-            TUser user = await _tokenRepository.GetByIdAsync(userId);
-
-            if (user is null && _options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
-                return TokenResult.SetFailed($"User with id {userId} not found.", 404);
-
-            int maxNumberOfActiveDevicesPerUser = _options.MaxNumberOfActiveDevices.GlobalLimit;
-
-            if (_options.MaxNumberOfActiveDevices.Type != MaxNumberOfActiveDevicesType.GlobalLimit)
-            {
-                maxNumberOfActiveDevicesPerUser = GetMaxNumberOfActiveDevicesPerUser(user);
-            }
-
-            if (await _tokenRepository.GetNumberOfActiveTokensAsync(userId) >= maxNumberOfActiveDevicesPerUser)
-            {
-                var oldedToken = await _tokenRepository.GetOldestTokenAsync(userId);
-                if (_options.PreventingLoginWhenAccessToMaxNumberOfActiveDevices || oldedToken == null)
-                    return TokenResult.SetFailed("Login not allowed because access to max number of active devices.", 401);
-
-                await _tokenRepository.DeleteAsync(oldedToken);
-            }
-
-            var newToken = await _tokenRepository.AddAsync(
-                userId,
-                _options.TokenGenerationMethod(),
-                GetExpiredDate());
-
-            return TokenResult.SetSuccess(newToken);
-        }
+        public virtual async Task<bool> ClearAsync() 
+            => await _tokenRepository.DeleteAsync();
 
         /// <inheritdoc/>
-        public async Task<bool> BlockAsync(TKey userId)
+        public virtual async Task<bool> ClearAsync(TKey userId) 
+            => await _tokenRepository.DeleteAsync(userId);
+
+        /// <inheritdoc/>
+        public virtual async Task<bool> ClearExpiredAsync() 
+            => await _tokenRepository.DeleteExpiredAsync();
+
+        /// <inheritdoc/>
+        public virtual async Task<bool> ClearExpiredAsync(TKey userId) 
+            => await _tokenRepository.DeleteExpiredAsync(userId);
+
+        /// <inheritdoc/>
+        public virtual async Task<bool> OnLogoutAsync(string token) 
+            => await _tokenRepository.DeleteAsync(token);
+        
+        /// <inheritdoc/>
+        public Task<bool> BlockAsync(TKey userId)
         {
             lock (_lock)
             {
                 if (_blackList.Contains(userId))
-                    return false;
+                    return Task.FromResult(false);
 
                 _blackList.Add(userId);
-                return true;
+                return Task.FromResult(true);
             }
         }
 
         /// <inheritdoc/>
-        public async Task<bool> UnblockAsync(TKey userId)
+        public Task<bool> UnblockAsync(TKey userId)
         {
             lock (_lock)
             {
                 if (!_blackList.Contains(userId))
-                    return false;
+                    return Task.FromResult(false);
 
                 _blackList.Remove(userId);
-                return true;
+                return Task.FromResult(true);
             }
         }
-
         #endregion
 
         #region Private
@@ -159,8 +169,8 @@ namespace EasyRefreshToken
             return _options.MaxNumberOfActiveDevices.GlobalLimit;
         }
 
-        private DateTime? GetExpiredDate()
-            => _options.TokenExpiredDays.HasValue ? DateTime.UtcNow.AddDays(_options.TokenExpiredDays.Value) : null;
+        private DateTime GetExpiredDate()
+            => _dateTimeProvider.Now.AddDays(_options.TokenExpiredDays);
         #endregion
     }
 }

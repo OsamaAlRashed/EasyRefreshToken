@@ -1,4 +1,5 @@
 ﻿using EasyRefreshToken.Abstractions;
+using EasyRefreshToken.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -26,6 +27,8 @@ namespace EasyRefreshToken.InMemory
             where TKey : IEquatable<TKey>
         {
             options ??= (option) => { };
+
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             services.Configure(options)
                 .Add(new ServiceDescriptor(typeof(ITokenRepository<TUser, TKey>), typeof(InMemoryTokenRepository<TUser, TKey>), lifetime));
