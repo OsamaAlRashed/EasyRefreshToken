@@ -25,7 +25,7 @@ namespace EasyRefreshToken.InMemory
             _options = options?.Value ?? new InMemoryTokenOptions<TUser, TKey>();
         }
 
-        public Task<string> AddAsync(TKey userId, string token, DateTime? expiredDate)
+        public Task<string> AddAsync(TKey userId, string token, DateTime expiredDate)
         {
             if (userId is null)
                 throw new ArgumentNullException(nameof(userId));

@@ -1,6 +1,6 @@
 ﻿using EasyRefreshToken.Enums;
 using EasyRefreshToken.Tests.IntegrationTests.InMemoryTests.Mocks;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;

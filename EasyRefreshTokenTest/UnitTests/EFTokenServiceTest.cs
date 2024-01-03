@@ -7,6 +7,8 @@ using NSubstitute;
 using Xunit;
 using System.Threading.Tasks;
 using EasyRefreshToken.Commons;
+using System;
+using EasyRefreshToken.Providers;
 
 namespace EasyRefreshToken.Tests.UnitTests;
 
@@ -16,10 +18,12 @@ public class EFTokenServiceTest
     private readonly ITokenRepository<User, int> _tokenRepository
         = Substitute.For<ITokenRepository<User, int>>();
     private readonly IOptions<EFTokenOptions> _options;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public EFTokenServiceTest()
     {
-        _sut = new EFTokenService<User, int>(_tokenRepository, _options);
+        _dateTimeProvider = new DateTimeProvider();
+        _sut = new EFTokenService<User, int>(_tokenRepository, _options, _dateTimeProvider);
     }
 
     [Fact]
@@ -39,7 +43,7 @@ public class EFTokenServiceTest
         _tokenRepository.GetNumberOfActiveTokensAsync(userId).Returns(0);
         _tokenRepository.GetOldestTokenAsync(userId).Returns(token);
         _tokenRepository.DeleteAsync(token).Returns(true);
-        _tokenRepository.AddAsync(userId, token, null).Returns(expectedResult.Token);
+        _tokenRepository.AddAsync(userId, token, DateTime.MaxValue).Returns(expectedResult.Token);
 
         // Act
         var tokenResult = await _sut.OnLoginAsync(userId);
@@ -73,7 +77,7 @@ public class EFTokenServiceTest
 
         _tokenRepository.IsValidTokenAsync(userId, oldToken).Returns(true);
         _tokenRepository.DeleteAsync(oldToken).Returns(true);
-        _tokenRepository.AddAsync(userId, oldToken, null).Returns(newToken);
+        _tokenRepository.AddAsync(userId, oldToken, DateTime.MaxValue).Returns(newToken);
 
         // Act
         var tokenResult = await _sut.OnAccessTokenExpiredAsync(userId, oldToken, true);

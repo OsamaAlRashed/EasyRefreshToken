@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using System.Linq;
 using EasyRefreshToken.Exceptions;
 using EasyRefreshToken.Tests.IntegrationTests.InMemoryTests.Mocks;

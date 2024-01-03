@@ -11,7 +11,8 @@ namespace EasyRefreshToken.InMemory
     {
         public InMemoryTokenService(
             ITokenRepository<TUser, TKey> repository,
-            IOptions<InMemoryTokenOptions<TUser, TKey>> options) : base(repository, MapOptions(options)) { }
+            IOptions<InMemoryTokenOptions<TUser, TKey>> options,
+            IDateTimeProvider dateTimeProvider) : base(repository, MapOptions(options), dateTimeProvider) { }
 
         private static RefreshTokenOptions MapOptions(IOptions<InMemoryTokenOptions<TUser, TKey>> efOptions)
         {

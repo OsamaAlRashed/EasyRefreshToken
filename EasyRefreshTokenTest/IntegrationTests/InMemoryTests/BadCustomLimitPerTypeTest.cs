@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using EasyRefreshToken.Abstractions;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using System.Linq;
 using EasyRefreshToken.Tests.IntegrationTests.InMemoryTests.Mocks;
 

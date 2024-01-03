@@ -1,5 +1,5 @@
 ﻿using EasyRefreshToken.EFCore;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using System;
 
 namespace EasyRefreshToken.Tests.IntegrationTests.EFCoreTests.Mocks;

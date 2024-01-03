@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using EasyRefreshToken.Tests.IntegrationTests.EFCoreTests.Mocks;
 
 namespace EasyRefreshToken.Tests.IntegrationTests.EFCoreTests;

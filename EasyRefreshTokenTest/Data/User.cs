@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 
-namespace EasyRefreshToken.Tests.Mocks;
+namespace EasyRefreshToken.Tests.Data;
 
 public class User : IdentityUser<Guid>, IUser<Guid>
 {

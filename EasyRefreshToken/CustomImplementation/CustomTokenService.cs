@@ -10,6 +10,7 @@ namespace EasyRefreshToken
     {
         public CustomTokenService(
             ITokenRepository<TUser, TKey> repository,
-            RefreshTokenOptions options) : base(repository, options) { }
+            RefreshTokenOptions options,
+            IDateTimeProvider dateTimeProvider) : base(repository, options, dateTimeProvider) { }
     }
 }

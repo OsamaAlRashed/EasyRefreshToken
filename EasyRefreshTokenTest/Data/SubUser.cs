@@ -1,4 +1,4 @@
-﻿namespace EasyRefreshToken.Tests.Mocks;
+﻿namespace EasyRefreshToken.Tests.Data;
 
 public class SubUser1 : User { }
 

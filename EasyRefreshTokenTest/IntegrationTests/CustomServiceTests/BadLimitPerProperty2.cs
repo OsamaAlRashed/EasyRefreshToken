@@ -1,5 +1,5 @@
 ﻿using EasyRefreshToken.Exceptions;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using System.Threading.Tasks;
 using Xunit;
 

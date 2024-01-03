@@ -62,7 +62,7 @@ namespace EasyRefreshToken.EFCore
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<string> AddAsync(TKey userId, string token, DateTime? expiredDate)
+        public async Task<string> AddAsync(TKey userId, string token, DateTime expiredDate)
         {
             var refreshToken = new TRefreshToken()
             {
@@ -70,6 +70,7 @@ namespace EasyRefreshToken.EFCore
                 UserId = userId,
                 ExpiredDate = expiredDate
             };
+
             _context.Add(refreshToken);
             if (_options.SaveChanges)
                 await _context.SaveChangesAsync();

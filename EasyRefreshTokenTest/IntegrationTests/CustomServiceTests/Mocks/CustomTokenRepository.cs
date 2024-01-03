@@ -1,6 +1,6 @@
 ﻿using EasyRefreshToken.Abstractions;
 using EasyRefreshToken.DependencyInjection;
-using EasyRefreshToken.Tests.Mocks;
+using EasyRefreshToken.Tests.Data;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -63,7 +63,7 @@ public class CustomTokenRepository : ITokenRepository<User, Guid>
     public async Task<bool> DeleteExpiredAsync(Guid userId)
     {
         var values = Get(userId)
-            .Where(x => x.ExpiredDate <= DateTime.UtcNow)
+            .Where(x => x.ExpiredDate <= _dateTimeProvider.Now)
             .ToList();
 
         _refreshTokens[userId] = values;
@@ -86,12 +86,14 @@ public class CustomTokenRepository : ITokenRepository<User, Guid>
     }
 
     public async Task<int> GetNumberOfActiveTokensAsync(Guid userId)
-        => Get(userId).Where(x => !x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow)
+        => Get(userId).Where(x => x.ExpiredDate >= DateTime.UtcNow)
           .Count();
 
     public async Task<string> GetOldestTokenAsync(Guid userId)
-        => Get(userId).Where(x => x.ExpiredDate.HasValue)
-            .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefault();
+        => Get(userId)
+            .OrderBy(x => x.ExpiredDate)
+            .Select(x => x.Token)
+            .FirstOrDefault();
 
     public async Task<bool> IsValidTokenAsync(Guid userId, string token)
         => Get(userId)
