@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>6.2.1</Version>
+		<Version>6.2.2</Version>
 		<Authors>Osama Al-Rashed</Authors>
 		<Company>None</Company>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
