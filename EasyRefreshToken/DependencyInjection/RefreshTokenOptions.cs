@@ -14,7 +14,7 @@ namespace EasyRefreshToken.DependencyInjection
         /// Gets or sets the number of days until the token expires. If set to null, the token will never expire. Default value is 7 days.
         /// </summary>
         [Range(1, int.MaxValue)]
-        public int? TokenExpiredDays { get; set; } = 7;
+        public int TokenExpiredDays { get; set; } = 7;
 
         /// <summary>
         /// Gets or sets a value indicating whether to prevent login operation when the maximum number of active devices is reached. If set to true and there is a valid token, login will be prevented. If set to false, the old token will be removed and a new token will be added. Default value is true.
