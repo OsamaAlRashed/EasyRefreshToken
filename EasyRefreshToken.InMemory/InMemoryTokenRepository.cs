@@ -1,4 +1,5 @@
 ﻿using EasyRefreshToken.Abstractions;
+using EasyRefreshToken.Providers;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -16,16 +17,19 @@ namespace EasyRefreshToken.InMemory
         private readonly InMemoryTokenOptions<TUser, TKey> _options;
         private readonly IServiceProvider _serviceProvider;
         private ConcurrentDictionary<TKey, List<InMemoryRefreshTokenModel>> _refreshTokens = new();
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         public InMemoryTokenRepository(
             IServiceProvider serviceProvider,
-            IOptions<InMemoryTokenOptions<TUser, TKey>> options)
+            IOptions<InMemoryTokenOptions<TUser, TKey>> options,
+            IDateTimeProvider dateTimeProvider)
         {
             _serviceProvider = serviceProvider;
             _options = options?.Value ?? new InMemoryTokenOptions<TUser, TKey>();
+            _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<string> AddAsync(TKey userId, string token, DateTime? expiredDate)
+        public Task<string> AddAsync(TKey userId, string token, DateTime expiredDate)
         {
             if (userId is null)
                 throw new ArgumentNullException(nameof(userId));
@@ -39,20 +43,24 @@ namespace EasyRefreshToken.InMemory
 
             _refreshTokens[userId] = values;
 
-            return token;
+            return Task.FromResult(token);
         }
 
-        public async Task<bool> DeleteAsync()
+        public Task<bool> DeleteAsync()
         {
             _refreshTokens.Clear();
 
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteAsync(TKey userId) 
-            => _refreshTokens.TryRemove(userId, out _);
+        public Task<bool> DeleteAsync(TKey userId)
+        {
+            var result = _refreshTokens.TryRemove(userId, out _);
+            
+            return Task.FromResult(result);
+        }
 
-        public async Task<bool> DeleteAsync(string token)
+        public Task<bool> DeleteAsync(string token)
         {
             foreach (var user in _refreshTokens)
             {
@@ -62,54 +70,76 @@ namespace EasyRefreshToken.InMemory
                 }
             }
 
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteExpiredAsync(TKey userId)
+        public Task<bool> DeleteExpiredAsync(TKey userId)
         {
-            var values = Get(userId).Where(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow).ToList();
+            var values = Get(userId)
+                .Where(x => x.ExpiredDate < _dateTimeProvider.Now)
+                .ToList();
 
             _refreshTokens[userId] = values;
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<bool> DeleteExpiredAsync()
         {
+            List<Task<bool>> tasks = new List<Task<bool>>();
+
             foreach (var user in _refreshTokens)
             {
-                await DeleteExpiredAsync(user.Key);
+                tasks.Add(DeleteExpiredAsync(user.Key));
             }
 
-            return true;
+            var results = await Task.WhenAll(tasks);
+
+            return !results.Any(x => x == false);
         }
 
-        public async Task<TUser?> GetByIdAsync(TKey userId)
+        public Task<TUser?> GetByIdAsync(TKey userId)
         {
             if (_options.GetUserById == null)
-                return null;
+                return Task.FromResult<TUser?>(null);
 
-            return _options.GetUserById(_serviceProvider, userId);
+            var user = _options.GetUserById(_serviceProvider, userId);
+
+            return Task.FromResult(user);
         }
 
-        public async Task<int> GetNumberOfActiveTokensAsync(TKey userId)
-            => Get(userId).Where(x => (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow))
-              .Count();
-
-        public async Task<string?> GetOldestTokenAsync(TKey userId)
-            => Get(userId).Where(x => x.ExpiredDate.HasValue)
-                .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefault();
-
-        public async Task<bool> IsValidTokenAsync(TKey userId, string token)
+        public Task<int> GetNumberOfActiveTokensAsync(TKey userId)
         {
-            return Get(userId).Where(x => x.Token == token &&
-                (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate))
+            var numberOfActiveTokens = Get(userId)
+                .Where(x => x.ExpiredDate >= _dateTimeProvider.Now)
+                .Count();
+
+            return Task.FromResult(numberOfActiveTokens);
+        }
+
+        public Task<string?> GetOldestTokenAsync(TKey userId)
+        {
+            var oldestToken = Get(userId)
+                .OrderBy(x => x.ExpiredDate)
+                .Select(x => x.Token)
+                .FirstOrDefault();
+
+            return Task.FromResult(oldestToken);
+        }
+
+        public Task<bool> IsValidTokenAsync(TKey userId, string token)
+        {
+            var isValidToken = Get(userId)
+                .Where(x => x.Token == token &&
+                        _dateTimeProvider.Now <= x.ExpiredDate)
                     .Any();
+
+            return Task.FromResult(isValidToken);
         }
 
         private List<InMemoryRefreshTokenModel> Get(TKey userId)
             => _refreshTokens.GetValueOrDefault(userId) ?? new List<InMemoryRefreshTokenModel>();
     }
 
-    internal record InMemoryRefreshTokenModel(string Token, DateTime? ExpiredDate);
+    internal record InMemoryRefreshTokenModel(string Token, DateTime ExpiredDate);
 }

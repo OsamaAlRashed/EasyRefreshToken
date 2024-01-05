@@ -17,19 +17,22 @@ namespace EasyRefreshToken.EFCore
     {
         private readonly TDbContext _context;
         private readonly EFTokenOptions _options;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
 
-        public EFTokenRepository(TDbContext context, IOptions<EFTokenOptions> options)
+        public EFTokenRepository(TDbContext context, IOptions<EFTokenOptions> options, IDateTimeProvider dateTimeProvider)
         {
             _context = context;
             _options = options?.Value ?? new EFTokenOptions();
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<bool> IsValidTokenAsync(TKey key, string token)
         {
             return await _context.Set<TRefreshToken>()
-                .Where(x => x.UserId.Equals(key) && x.Token == token
-                    && (!_options.TokenExpiredDays.HasValue || DateTime.UtcNow <= x.ExpiredDate))
+                .Where(x => x.UserId.Equals(key) &&
+                            x.Token == token &&
+                            _dateTimeProvider.Now <= x.ExpiredDate)
                 .AnyAsync();
         }
 
@@ -49,10 +52,10 @@ namespace EasyRefreshToken.EFCore
         }
 
         public async Task<bool> DeleteExpiredAsync()
-            => await DeleteAsync(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow);
+            => await DeleteAsync(x => x.ExpiredDate < _dateTimeProvider.Now);
 
         public async Task<bool> DeleteExpiredAsync(TKey key)
-            => await DeleteAsync(x => x.UserId.Equals(key) && x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow);
+            => await DeleteAsync(x => x.UserId.Equals(key) && x.ExpiredDate < _dateTimeProvider.Now);
 
         public async Task<TUser?> GetByIdAsync(TKey userId)
         {
@@ -61,7 +64,7 @@ namespace EasyRefreshToken.EFCore
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<string> AddAsync(TKey userId, string token, DateTime? expiredDate)
+        public async Task<string> AddAsync(TKey userId, string token, DateTime expiredDate)
         {
             var refreshToken = new TRefreshToken()
             {
@@ -69,6 +72,7 @@ namespace EasyRefreshToken.EFCore
                 UserId = userId,
                 ExpiredDate = expiredDate
             };
+
             _context.Add(refreshToken);
             if (_options.SaveChanges)
                 await _context.SaveChangesAsync();
@@ -77,12 +81,12 @@ namespace EasyRefreshToken.EFCore
         }
         public async Task<int> GetNumberOfActiveTokensAsync(TKey userId)
             => await _context.Set<TRefreshToken>()
-            .Where(x => x.UserId.Equals(userId) && (!x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow))
+            .Where(x => x.UserId.Equals(userId) && x.ExpiredDate >= _dateTimeProvider.Now)
             .CountAsync();
 
         public async Task<string?> GetOldestTokenAsync(TKey userId)
             => await _context.Set<TRefreshToken>()
-                .Where(x => x.UserId.Equals(userId) && x.ExpiredDate.HasValue)
+                .Where(x => x.UserId.Equals(userId))
                 .OrderBy(x => x.ExpiredDate).Select(x => x.Token).FirstOrDefaultAsync();
 
         private async Task<bool> DeleteAsync(Expression<Func<RefreshToken<TUser, TKey>, bool>> filter)

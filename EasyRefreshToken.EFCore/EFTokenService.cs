@@ -12,8 +12,9 @@ namespace EasyRefreshToken.EFCore
 
         public EFTokenService(
             ITokenRepository<TUser, TKey> repository,
-            IOptions<EFTokenOptions> options)
-            : base(repository, MapOptions(options)) { }
+            IOptions<EFTokenOptions> options,
+            IDateTimeProvider dateTimeProvider)
+            : base(repository, MapOptions(options), dateTimeProvider) { }
 
         private static RefreshTokenOptions MapOptions(IOptions<EFTokenOptions> efOptions)
         {

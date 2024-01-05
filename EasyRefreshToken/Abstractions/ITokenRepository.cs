@@ -14,9 +14,9 @@ namespace EasyRefreshToken.Abstractions
         /// Adds a new token.
         /// <param name="userId">The user's key.</param>
         /// <param name="token">The token to add.</param>
-        /// <param name="expiredDate">The expiration date of the token (optional).</param>
+        /// <param name="expiredDate">The expiration date of the token.</param>
         /// <returns>The new token.</returns>
-        Task<string> AddAsync(TKey userId, string token, DateTime? expiredDate);
+        Task<string> AddAsync(TKey userId, string token, DateTime expiredDate);
 
         /// <summary>
         /// Retrieves a user by Id.

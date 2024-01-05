@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using System;
+using EasyRefreshToken.Providers;
 
 namespace EasyRefreshToken.EFCore
 {
@@ -31,6 +32,8 @@ namespace EasyRefreshToken.EFCore
             where TKey : IEquatable<TKey>
         {
             options ??= (option) => { };
+
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             services.Configure(options)
                 .Add(new ServiceDescriptor(typeof(ITokenRepository<TUser, TKey>), typeof(EFTokenRepository<TDbContext, TRefreshToken, TUser, TKey>), lifetime));
