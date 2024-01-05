@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>8.2.1</Version>
+    <Version>8.2.2</Version>
     <Authors>Osama Al-Rashed</Authors>
     <Company>None</Company>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
