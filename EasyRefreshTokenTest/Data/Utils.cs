@@ -12,20 +12,13 @@ public class Utils
         this.context = context;
     }
 
-    private async Task<LoginVM> GenerateUserBase(int number = 0, int? userType = null)
+    private async Task<LoginVM> GenerateUserBase(int number = 0, UserType? userType = null)
     {
-        var user = new User();
-        if (userType != null)
+        var user = new User
         {
-            if (userType == 0)
-            {
-                user.UserType = UserType.Admin;
-            }
-            if (userType == 1)
-            {
-                user.UserType = UserType.Employee;
-            }
-        }
+            UserType = userType
+        };
+
         if (number == 1)
         {
             user = new SubUser1();
@@ -34,11 +27,11 @@ public class Utils
         {
             user = new SubUser2();
         }
-        var userName = "User" + GetNumberToken();
-        var password = "demo";
+
         context.Users.Add(user);
         await context.SaveChangesAsync();
-        return new LoginVM { Id = user.Id, UserName = user.UserName, Password = password };
+
+        return new LoginVM { Id = user.Id };
     }
 
     public async Task<LoginVM> GenerateUser()
@@ -49,29 +42,13 @@ public class Utils
      => await GenerateUserBase(2);
 
     public async Task<LoginVM> GenerateAdmin()
-     => await GenerateUserBase(0, 0);
+     => await GenerateUserBase(0, UserType.Admin);
 
     public async Task<LoginVM> GenerateEmployee()
-     => await GenerateUserBase(0, 1);
-
-    private static string GetNumberToken(int size = 4)
-    {
-        Random random = new();
-        var token = "";
-        int c = 0;
-        while (c < size)
-        {
-            int x = random.Next(0, 9);
-            token += x.ToString();
-            c++;
-        }
-        return token;
-    }
+     => await GenerateUserBase(0, UserType.Employee);
 
     public class LoginVM
     {
         public Guid Id { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
     }
 }

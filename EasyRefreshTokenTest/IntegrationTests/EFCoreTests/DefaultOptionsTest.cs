@@ -167,7 +167,7 @@ public class DefaultOptionsTest
 
         var token = _context.RefreshTokens
             .Where(x => x.Token == tokenResult1.Token).FirstOrDefault();
-        token.ExpiredDate = token.ExpiredDate.Value.AddDays(-7);
+        token.ExpiredDate = token.ExpiredDate.AddDays(-7);
         await _context.SaveChangesAsync();
 
         var tokenResult2 = await _tokenService.OnAccessTokenExpiredAsync(user.Id, tokenResult1.Token);

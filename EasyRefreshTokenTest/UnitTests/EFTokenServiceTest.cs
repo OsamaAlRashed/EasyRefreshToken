@@ -31,19 +31,11 @@ public class EFTokenServiceTest
     {
         // Arrange
         int userId = 1;
-        string token = Helpers.GenerateRefreshToken();
-        var expectedResult = new TokenResult()
-        {
-            IsSucceeded = true,
-            Token = token,
-            Code = 200
-        };
 
         _tokenRepository.GetByIdAsync(userId).Returns(new User(userId));
         _tokenRepository.GetNumberOfActiveTokensAsync(userId).Returns(0);
-        _tokenRepository.GetOldestTokenAsync(userId).Returns(token);
-        _tokenRepository.DeleteAsync(token).Returns(true);
-        _tokenRepository.AddAsync(userId, token, DateTime.MaxValue).Returns(expectedResult.Token);
+        _tokenRepository.GetOldestTokenAsync(userId).Returns(string.Empty);
+        _tokenRepository.DeleteAsync(string.Empty).Returns(true);
 
         // Act
         var tokenResult = await _sut.OnLoginAsync(userId);

@@ -1,4 +1,5 @@
 ﻿using EasyRefreshToken.Abstractions;
+using EasyRefreshToken.Providers;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -16,13 +17,16 @@ namespace EasyRefreshToken.InMemory
         private readonly InMemoryTokenOptions<TUser, TKey> _options;
         private readonly IServiceProvider _serviceProvider;
         private ConcurrentDictionary<TKey, List<InMemoryRefreshTokenModel>> _refreshTokens = new();
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         public InMemoryTokenRepository(
             IServiceProvider serviceProvider,
-            IOptions<InMemoryTokenOptions<TUser, TKey>> options)
+            IOptions<InMemoryTokenOptions<TUser, TKey>> options,
+            IDateTimeProvider dateTimeProvider)
         {
             _serviceProvider = serviceProvider;
             _options = options?.Value ?? new InMemoryTokenOptions<TUser, TKey>();
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public Task<string> AddAsync(TKey userId, string token, DateTime expiredDate)
@@ -72,7 +76,7 @@ namespace EasyRefreshToken.InMemory
         public Task<bool> DeleteExpiredAsync(TKey userId)
         {
             var values = Get(userId)
-                .Where(x => x.ExpiredDate.HasValue && x.ExpiredDate < DateTime.UtcNow)
+                .Where(x => x.ExpiredDate < _dateTimeProvider.Now)
                 .ToList();
 
             _refreshTokens[userId] = values;
@@ -107,7 +111,7 @@ namespace EasyRefreshToken.InMemory
         public Task<int> GetNumberOfActiveTokensAsync(TKey userId)
         {
             var numberOfActiveTokens = Get(userId)
-                .Where(x => !x.ExpiredDate.HasValue || x.ExpiredDate >= DateTime.UtcNow)
+                .Where(x => x.ExpiredDate >= _dateTimeProvider.Now)
                 .Count();
 
             return Task.FromResult(numberOfActiveTokens);
@@ -116,7 +120,6 @@ namespace EasyRefreshToken.InMemory
         public Task<string?> GetOldestTokenAsync(TKey userId)
         {
             var oldestToken = Get(userId)
-                .Where(x => x.ExpiredDate.HasValue)
                 .OrderBy(x => x.ExpiredDate)
                 .Select(x => x.Token)
                 .FirstOrDefault();
@@ -128,7 +131,7 @@ namespace EasyRefreshToken.InMemory
         {
             var isValidToken = Get(userId)
                 .Where(x => x.Token == token &&
-                        DateTime.UtcNow <= x.ExpiredDate)
+                        _dateTimeProvider.Now <= x.ExpiredDate)
                     .Any();
 
             return Task.FromResult(isValidToken);
@@ -138,5 +141,5 @@ namespace EasyRefreshToken.InMemory
             => _refreshTokens.GetValueOrDefault(userId) ?? new List<InMemoryRefreshTokenModel>();
     }
 
-    internal record InMemoryRefreshTokenModel(string Token, DateTime? ExpiredDate);
+    internal record InMemoryRefreshTokenModel(string Token, DateTime ExpiredDate);
 }

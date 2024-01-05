@@ -22,7 +22,7 @@ namespace EasyRefreshToken.EFCore
         /// <summary>
         /// Gets or sets the expiration date of the refresh token.
         /// </summary>
-        public virtual DateTime? ExpiredDate { get; set; }
+        public virtual DateTime ExpiredDate { get; set; }
 
         /// <summary>
         /// Gets or sets the associated user entity.
