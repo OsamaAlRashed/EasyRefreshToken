@@ -1,13 +1,7 @@
 ﻿namespace EasyRefreshToken.Tests.UnitTests.Models;
 
-public class User : IUser<int>
+public class User(int id) : IUser<int>
 {
-    public User(int id)
-    {
-        Id = id;
-        FullName = string.Empty;
-    }
-
-    public int Id { get; set; }
-    public string FullName { get; set; }
+    public int Id { get; set; } = id;
+    public string FullName { get; set; } = string.Empty;
 }

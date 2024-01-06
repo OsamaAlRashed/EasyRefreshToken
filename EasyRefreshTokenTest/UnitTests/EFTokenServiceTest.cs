@@ -36,6 +36,8 @@ public class EFTokenServiceTest
         _tokenRepository.GetNumberOfActiveTokensAsync(userId).Returns(0);
         _tokenRepository.GetOldestTokenAsync(userId).Returns(string.Empty);
         _tokenRepository.DeleteAsync(string.Empty).Returns(true);
+        _tokenRepository.AddAsync(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>())
+            .Returns(Helpers.GenerateRefreshToken());
 
         // Act
         var tokenResult = await _sut.OnLoginAsync(userId);
@@ -69,7 +71,8 @@ public class EFTokenServiceTest
 
         _tokenRepository.IsValidTokenAsync(userId, oldToken).Returns(true);
         _tokenRepository.DeleteAsync(oldToken).Returns(true);
-        _tokenRepository.AddAsync(userId, oldToken, DateTime.MaxValue).Returns(newToken);
+        _tokenRepository.AddAsync(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>())
+            .Returns(newToken);
 
         // Act
         var tokenResult = await _sut.OnAccessTokenExpiredAsync(userId, oldToken, true);
